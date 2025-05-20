@@ -3,6 +3,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@section Styles {
+    <!-- o arquivo deve estar em wwwroot/css/cadastroUsuario.css -->
+    <link rel="stylesheet" href="~/css/cadastroUsuario.css" asp-append-version="true" />
+}
+
 <form action="Save" enctype="multipart/form-data" method="post" class="col-md-6">
     <input type="hidden" name="Operacao" value="@ViewBag.Operacao" />
 
