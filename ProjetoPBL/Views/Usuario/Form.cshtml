@@ -1,0 +1,95 @@
+﻿@model UsuarioViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form action="Save" enctype="multipart/form-data" method="post" class="col-md-6">
+    <input type="hidden" name="Operacao" value="@ViewBag.Operacao" />
+
+    @* <label for="Id" class="control-label">Id</label> *@
+    @if (ViewBag.Operacao == "I")
+    {
+        <input asp-for="Id" class="form-control" type="hidden" readonly/>
+    }
+    else
+    {
+        <input asp-for="Id" class="form-control" type="hidden" readonly />
+    }
+    <span asp-validation-for="Id" class="text-danger"></span>
+    <br />
+
+    <label for="Nome" class="control-label">Insira o seu nome completo</label>
+    <input asp-for="Nome" class="form-control" />
+    <span asp-validation-for="Nome" class="text-danger"></span>
+    <br />
+
+    <label for="Email" class="control-label">Insira o seu email</label>
+    <input asp-for="Email" class="form-control" />
+    <span asp-validation-for="Email" class="text-danger"></span>
+    <br />
+
+    <label for="DataNascimento" class="control-label">Insira a sua data de nascimento</label>
+    <input asp-for="DataNascimento" type="date" value="@Model.DataNascimento.ToString("yyyy-MM-dd")" class="form-control" />
+    <span asp-validation-for="DataNascimento" class="text-danger"></span>
+    <br />
+
+    <label for="SexoId" class="control-label">Selecione o seu gênero</label>
+    <select asp-for="SexoId" asp-items="ViewBag.Sexos" class="form-control"> </select>
+    <span asp-validation-for="SexoId" class="text-danger"></span>
+    <br />
+
+    <label for="Cep" class="control-label">Insira o cep</label>
+    <input asp-for="Cep" class="form-control" />
+    <span asp-validation-for="Cep" class="text-danger"></span>
+    <br />
+
+    <label for="Logradouro" class="control-label">Insira o endereço</label>
+    <input asp-for="Logradouro" class="form-control" />
+    <span asp-validation-for="Logradouro" class="text-danger"></span>
+    <br />
+
+    <label for="Numero" class="control-label">Insira o número da residência</label>
+    <input asp-for="Numero" class="form-control" />
+    <span asp-validation-for="Numero" class="text-danger"></span>
+    <br />
+
+    <label for="Cidade" class="control-label">Insira a sua cidade</label>
+    <input asp-for="Cidade" class="form-control" />
+    <span asp-validation-for="Cidade" class="text-danger"></span>
+    <br />
+
+    <label for="Estado" class="control-label">Insira o seu Estado</label>
+    <input asp-for="Estado" class="form-control" />
+    <span asp-validation-for="Estado" class="text-danger"></span>
+    <br />
+
+    <label for="LoginUsuario" class="control-label">Insira seu usuario</label>
+    <input asp-for="LoginUsuario" class="form-control" />
+    <span asp-validation-for="LoginUsuario" class="text-danger"></span>
+    <br />
+
+    <label for="Senha" class="control-label">Insira sua senha</label>
+    <input asp-for="Senha" class="form-control" />
+    <span asp-validation-for="Senha" class="text-danger"></span>
+    <br />
+
+    <input type="file" name="Imagem" id="Imagem" onchange="exibirImagem()" class="btn btn-secondary">
+    <img id="imgPreview" src="data:image/jpeg;base64,@Model.ImagemEmBase64" class="img-responsive"
+         width="100">
+    <span asp-validation-for="Imagem" class="text-danger"></span>
+
+    <br />
+    <input type="submit" value="Finalizar cadastro" class="btn btn-info" />
+    <br />
+</form>
+
+<script>
+    function exibirImagem() {
+        var oFReader = new FileReader();
+        oFReader.readAsDataURL(document.getElementById("Imagem").files[0]);
+        oFReader.onload = function (oFREvent) {
+            document.getElementById("imgPreview").src = oFREvent.target.result;
+        };
+    }
+</script>
+

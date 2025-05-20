@@ -1,0 +1,32 @@
+﻿<head>
+    <meta charset="utf-8" />
+    <title>Magitech</title>
+    <link rel="stylesheet" href="/css/login.css" />
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="title">Bem-vindo!</div>
+
+        <form action="/login/Fazlogin" method="post">
+            <div class="field">
+                <input type="text" name="usuario" required />
+                <label>Usuário</label>
+            </div>
+
+            <div class="field">
+                <input type="password" name="senha" required />
+                <label>Senha</label>
+            </div>
+
+            <div class="field">
+                <input type="submit" value="Login" />
+            </div>
+
+            <div class="signup-link">
+                Não possui conta? <a href="/usuario/Create">Registre-se agora</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
