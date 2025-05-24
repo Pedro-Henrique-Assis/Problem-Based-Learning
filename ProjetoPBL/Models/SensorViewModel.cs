@@ -1,4 +1,6 @@
-﻿namespace ProjetoPBL.Models
+﻿using System;
+
+namespace ProjetoPBL.Models
 {
     public class SensorViewModel : PadraoViewModel
     {
@@ -6,7 +8,7 @@
         public string descricaoSensor { get; set; }
         public string localInstalacao { get; set; }
         public decimal valorInstalacao { get; set; }
-        public DateTime dataInstacao { get; set; }
+        public DateTime dataInstalacao { get; set; }
 
     }
 }

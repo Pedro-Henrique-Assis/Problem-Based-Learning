@@ -12,9 +12,13 @@ namespace ProjetoPBL.DAO
     public class SensorDAO : PadraoDAO<SensorViewModel>
     {
         /// <summary>
-        /// Define a tabela do sensor
+        /// Define a tabela e a stored procedure de listagem
         /// </summary>
-        protected override void SetTabela() { nomeTabela = "sensor"; }
+        protected override void SetTabela()
+        {
+            Tabela = "sensor"; // nome da tabela no banco
+            NomeSpListagem = "spListagem_sensor"; // se você tiver essa SP criada
+        }
 
         /// <summary>
         /// Cria os parâmetros de SQL para inserir ou atualizar um sensor
@@ -25,14 +29,14 @@ namespace ProjetoPBL.DAO
         {
             List<SqlParameter> parametros = new List<SqlParameter>();
 
-            if (sensor.id != 0)
-                parametros.Add(new SqlParameter("id", sensor.id));
+            if (sensor.Id != 0)
+                parametros.Add(new SqlParameter("id", sensor.Id));
 
             parametros.Add(new SqlParameter("nomeSensor", sensor.nomeSensor));
             parametros.Add(new SqlParameter("descricaoSensor", sensor.descricaoSensor));
             parametros.Add(new SqlParameter("localInstalacao", sensor.localInstalacao));
             parametros.Add(new SqlParameter("valorInstalacao", sensor.valorInstalacao));
-            parametros.Add(new SqlParameter("dataInstacao", sensor.dataInstacao));
+            parametros.Add(new SqlParameter("dataInstacao", sensor.dataInstalacao));
 
             return parametros.ToArray();
         }
@@ -42,18 +46,18 @@ namespace ProjetoPBL.DAO
         /// </summary>
         /// <param name="registro">Linha de dados da tabela</param>
         /// <returns>Objeto SensorViewModel</returns>
-        protected override SensorViewModel MontarModel(DataRow registro)
-        {
-            return new SensorViewModel
-            {
-                id = Convert.ToInt32(registro["id"]),
-                nomeSensor = registro["nomeSensor"].ToString(),
-                descricaoSensor = registro["descricaoSensor"].ToString(),
-                localInstalacao = registro["localInstalacao"].ToString(),
-                valorInstalacao = Convert.ToDecimal(registro["valorInstalacao"]),
-                dataInstacao = Convert.ToDateTime(registro["dataInstacao"])
-            };
-        }
+        //protected override SensorViewModel MontarModel(DataRow registro)
+        //{
+        //    return new SensorViewModel
+        //    {
+        //        Id = Convert.ToInt32(registro["id"]),
+        //        nomeSensor = registro["nomeSensor"].ToString(),
+        //        descricaoSensor = registro["descricaoSensor"].ToString(),
+        //        localInstalacao = registro["localInstalacao"].ToString(),
+        //        valorInstalacao = Convert.ToDecimal(registro["valorInstalacao"]),
+        //        dataInstacao = Convert.ToDateTime(registro["dataInstalacao"])
+        //    };
+        //}
 
         /// <summary>
         /// Verifica se já existe um sensor com o mesmo nome
@@ -63,11 +67,17 @@ namespace ProjetoPBL.DAO
         public int VerificarSensoresRepetidos(string nomeSensor)
         {
             SqlParameter[] sp = new SqlParameter[] { new SqlParameter("nomeSensor", nomeSensor) };
-            DataTable dt = HelperSqlDAO.ExecutaProcSelect("sp_verificar_sensor", sp);
+            DataTable dt = HelperDAO.ExecutaProcSelect("sp_verificar_sensor", sp);
             return Convert.ToInt32(dt.Rows[0]["cont"]);
+        }
+
+        protected override SensorViewModel MontaModel(DataRow registro)
+        {
+            throw new NotImplementedException();
         }
     }
 }
+
 
 //--Script de criação da tabela sensor
 //CREATE TABLE sensor (
@@ -76,7 +86,7 @@ namespace ProjetoPBL.DAO
 //    descricaoSensor VARCHAR(255),
 //    localInstalacao VARCHAR(100),
 //    valorInstalacao DECIMAL(10, 2),
-//    dataInstacao DATETIME
+//    dataInstalacao DATETIME
 //);
 
 //--Verifica se já existe um sensor com o mesmo nome
@@ -89,17 +99,17 @@ namespace ProjetoPBL.DAO
 //    WHERE nomeSensor = @nomeSensor;
 //END
 
-//    -- Insere um novo sensor
+//-- Insere um novo sensor
 //CREATE PROCEDURE sp_inserir_sensor
 //    @nomeSensor VARCHAR(100),
 //    @descricaoSensor VARCHAR(255),
 //    @localInstalacao VARCHAR(100),
 //    @valorInstalacao DECIMAL(10,2),
-//    @dataInstacao DATETIME
+//    @dataInstalacao DATETIME
 //AS
 //BEGIN
-//    INSERT INTO sensor (nomeSensor, descricaoSensor, localInstalacao, valorInstalacao, dataInstacao)
-//    VALUES (@nomeSensor, @descricaoSensor, @localInstalacao, @valorInstalacao, @dataInstacao);
+//    INSERT INTO sensor (nomeSensor, descricaoSensor, localInstalacao, valorInstalacao, dataInstalacao)
+//    VALUES (@nomeSensor, @descricaoSensor, @localInstalacao, @valorInstalacao, @dataInstalacao);
 //END
 
 //-- Atualiza um sensor existente
@@ -109,7 +119,7 @@ namespace ProjetoPBL.DAO
 //    @descricaoSensor VARCHAR(255),
 //    @localInstalacao VARCHAR(100),
 //    @valorInstalacao DECIMAL(10,2),
-//    @dataInstacao DATETIME
+//    @dataInstalacao DATETIME
 //AS
 //BEGIN
 //    UPDATE sensor
@@ -118,6 +128,7 @@ namespace ProjetoPBL.DAO
 //        descricaoSensor = @descricaoSensor,
 //        localInstalacao = @localInstalacao,
 //        valorInstalacao = @valorInstalacao,
-//        dataInstacao = @dataInstacao
+//        dataInstalacao = @dataInstalacao
 //    WHERE id = @id;
 //END
+

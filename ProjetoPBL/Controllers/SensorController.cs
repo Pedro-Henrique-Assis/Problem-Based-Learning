@@ -1,19 +1,22 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjetoPBL.DAO;
 using ProjetoPBL.Models;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
+using System.Threading.Tasks;
 
 namespace ProjetoPBL.Controllers
 {
     public class SensorController : PadraoController<SensorViewModel>
     {
-        public SensorController() { dao = new SensorDAO(); }
+        public SensorController()
+        {
+            DAO = new SensorDAO();
+        }
 
+        /// <summary>
+        /// Valida os dados do sensor no FIWARE antes de inserir
+        /// </summary>
         private async Task ValidarDadosFiware(SensorViewModel model, string operacao)
         {
             if (!await HelperFiwareDAO.VerificarServer(HelperFiwareDAO.host))
@@ -23,23 +26,17 @@ namespace ProjetoPBL.Controllers
 
             if (ModelState.IsValid && operacao == "I")
             {
-                await HelperFiwareDAO.CriarLamp(HelperFiwareDAO.host, model.nomeSensor);
+                await HelperFiwareDAO.CriarSensorTemperatura(HelperFiwareDAO.host, model.nomeSensor);
             }
         }
 
-        protected override void AdicionarViewbagsForm()
-        {
-            // Se precisar popular combos
-        }
 
-        protected override void AdicionarViewbagsIndex()
+        /// <summary>
+        /// Valida os dados do formulário antes de inserir/editar
+        /// </summary>
+        protected override void ValidaDados(SensorViewModel model, string operacao)
         {
-            // Se necessário para listagem
-        }
-
-        protected override void ValidarDados(SensorViewModel model, string operacao)
-        {
-            base.ValidarDados(model, operacao);
+            base.ValidaDados(model, operacao);
 
             SensorDAO sDAO = new SensorDAO();
 
@@ -57,27 +54,33 @@ namespace ProjetoPBL.Controllers
             if (model.valorInstalacao < 0)
                 ModelState.AddModelError("valorInstalacao", "O valor de instalação não pode ser negativo.");
 
-            if (model.dataInstacao > DateTime.Now)
-                ModelState.AddModelError("dataInstacao", "A data de instalação não pode estar no futuro.");
+            if (model.dataInstalacao > DateTime.Now)
+                ModelState.AddModelError("dataInstalacao", "A data de instalação não pode estar no futuro.");
 
             if (ModelState.IsValid && operacao == "I")
                 ValidarDadosFiware(model, operacao).GetAwaiter().GetResult();
         }
 
-        public IActionResult TrocaMalha(string malha)
-        {
-            ViewBag.Malha = malha;
-            return View("Dashboard", null);
-        }
+        /// <summary>
+        /// Endpoint que permite trocar a visualização entre tipos de malha
+        /// </summary>
+        //public IActionResult TrocaMalha(string malha)
+        //{
+        //    ViewBag.Malha = malha;
+        //    return View("Dashboard", null);
+        //}
 
-        public async Task<IActionResult> PegarUltimosDados()
-        {
-            string host = "4.228.64.5";
-            string lampId = "03y";
-            int lastN = 50;
+        /// <summary>
+        /// Retorna as últimas leituras de temperatura do sensor
+        /// </summary>
+        //public async Task<IActionResult> PegarUltimosDados()
+        //{
+        //    string host = "54.225.206.198";
+        //    string sensorId = "03y"; // pode ser substituído por uma variável dinâmica
+        //    int lastN = 50;
 
-            var leituras = await HelperFiwareDAO.VerificarDados(host, lampId, lastN);
-            return Json(leituras);
-        }
+        //    var leituras = await HelperFiwareDAO.VerificarDados(host, sensorId, lastN);
+        //    return Json(leituras);
+        //}
     }
 }

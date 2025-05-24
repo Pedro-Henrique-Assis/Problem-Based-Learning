@@ -2,11 +2,15 @@
 // Classe responsável pela integração do sistema com o FIWARE
 // Realiza operações como verificação de servidor, leitura de sensores, provisionamento de dispositivos e subscrição de dados
 
-using RestSharp;
-using SitePBL.Models;
+using ProjetoPBL.Models;
 using System.Text.Json;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System;
 
-namespace SitePBL.DAO
+namespace ProjetoPBL.DAO
 {
     public static class HelperFiwareDAO
     {
@@ -20,10 +24,11 @@ namespace SitePBL.DAO
         {
             try
             {
-                var options = new RestClientOptions($"http://{host}:4041") { MaxTimeout = -1 };
-                var client = new RestClient(options);
-                var request = new RestRequest("/iot/about", Method.Get);
-                var response = await client.ExecuteAsync(request);
+                using var client = new HttpClient();
+                client.Timeout = TimeSpan.FromSeconds(10);
+
+                var response = await client.GetAsync($"http://{host}:4041/iot/about");
+
                 return response.IsSuccessStatusCode;
             }
             catch { return false; }
@@ -34,18 +39,21 @@ namespace SitePBL.DAO
         /// </summary>
         public static async Task<List<LeituraViewModel>> VerificarDados(string host, string sensor, int n)
         {
-            List<LeituraViewModel> leituras = new();
+            List<LeituraViewModel> leituras = new List<LeituraViewModel>();
 
-            var options = new RestClientOptions($"http://{host}:8666") { MaxTimeout = -1 };
-            var client = new RestClient(options);
-            var request = new RestRequest($"/STH/v1/contextEntities/type/TemperatureSensor/id/urn:ngsi-ld:TemperatureSensor:{sensor}/attributes/temperature?lastN={n}", Method.Get);
-            request.AddHeader("fiware-service", "smart");
-            request.AddHeader("fiware-servicepath", "/");
+            using var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(10);
 
-            var response = await client.ExecuteAsync(request);
+            var request = new HttpRequestMessage(HttpMethod.Get,
+                $"http://{host}:8666/STH/v1/contextEntities/type/TemperatureSensor/id/urn:ngsi-ld:TemperatureSensor:{sensor}/attributes/temperature?lastN={n}");
+            request.Headers.Add("fiware-service", "smart");
+            request.Headers.Add("fiware-servicepath", "/");
+
+            var response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                var doc = JsonDocument.Parse(response.Content);
+                var content = await response.Content.ReadAsStringAsync();
+                var doc = JsonDocument.Parse(content);
                 var contexto = doc.RootElement.GetProperty("contextResponses");
 
                 foreach (var contextResponse in contexto.EnumerateArray())
@@ -77,17 +85,20 @@ namespace SitePBL.DAO
         /// </summary>
         public static async Task<LeituraViewModel> Ler(string host, string sensor)
         {
-            var options = new RestClientOptions($"http://{host}:1026") { MaxTimeout = -1 };
-            var client = new RestClient(options);
-            var request = new RestRequest($"/v2/entities/urn:ngsi-ld:TemperatureSensor:{sensor}/attrs/temperature", Method.Get);
-            request.AddHeader("fiware-service", "smart");
-            request.AddHeader("fiware-servicepath", "/");
-            request.AddHeader("accept", "application/json");
+            using var client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(10);
 
-            var response = await client.ExecuteAsync(request);
+            var request = new HttpRequestMessage(HttpMethod.Get,
+                $"http://{host}:1026/v2/entities/urn:ngsi-ld:TemperatureSensor:{sensor}/attrs/temperature");
+            request.Headers.Add("fiware-service", "smart");
+            request.Headers.Add("fiware-servicepath", "/");
+            request.Headers.Add("accept", "application/json");
+
+            var response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                var doc = JsonDocument.Parse(response.Content);
+                var content = await response.Content.ReadAsStringAsync();
+                var doc = JsonDocument.Parse(content);
                 float temp = doc.RootElement.GetProperty("value").GetSingle();
                 string dataString = doc.RootElement.GetProperty("metadata").GetProperty("TimeInstant").GetProperty("value").ToString();
                 DateTime data = DateTime.Parse(dataString);
@@ -111,12 +122,8 @@ namespace SitePBL.DAO
         /// </summary>
         private static async Task ProvisionarSensor(string host, string sensor)
         {
-            var options = new RestClientOptions($"http://{host}:4041") { MaxTimeout = -1 };
-            var client = new RestClient(options);
-            var request = new RestRequest("/iot/devices", Method.Post);
-            request.AddHeader("Content-Type", "application/json");
-            request.AddHeader("fiware-service", "smart");
-            request.AddHeader("fiware-servicepath", "/");
+            using var client = new HttpClient();
+            var url = $"http://{host}:4041/iot/devices";
 
             var body = new
             {
@@ -137,9 +144,12 @@ namespace SitePBL.DAO
                 }
             };
 
-            string jsonBody = JsonSerializer.Serialize(body);
-            request.AddStringBody(jsonBody, DataFormat.Json);
-            await client.ExecuteAsync(request);
+            var json = JsonSerializer.Serialize(body);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            content.Headers.Add("fiware-service", "smart");
+            content.Headers.Add("fiware-servicepath", "/");
+
+            await client.PostAsync(url, content);
         }
 
         /// <summary>
@@ -147,12 +157,8 @@ namespace SitePBL.DAO
         /// </summary>
         private static async Task RegistrarSensor(string host, string sensor)
         {
-            var options = new RestClientOptions($"http://{host}:1026") { MaxTimeout = -1 };
-            var client = new RestClient(options);
-            var request = new RestRequest("/v2/registrations", Method.Post);
-            request.AddHeader("Content-Type", "application/json");
-            request.AddHeader("fiware-service", "smart");
-            request.AddHeader("fiware-servicepath", "/");
+            using var client = new HttpClient();
+            var url = $"http://{host}:1026/v2/registrations";
 
             var body = new
             {
@@ -172,9 +178,12 @@ namespace SitePBL.DAO
                 }
             };
 
-            string jsonBody = JsonSerializer.Serialize(body);
-            request.AddStringBody(jsonBody, DataFormat.Json);
-            await client.ExecuteAsync(request);
+            var json = JsonSerializer.Serialize(body);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            content.Headers.Add("fiware-service", "smart");
+            content.Headers.Add("fiware-servicepath", "/");
+
+            await client.PostAsync(url, content);
         }
 
         /// <summary>
@@ -182,12 +191,8 @@ namespace SitePBL.DAO
         /// </summary>
         private static async Task AssinarSensor(string host, string sensor)
         {
-            var options = new RestClientOptions($"http://{host}:1026") { MaxTimeout = -1 };
-            var client = new RestClient(options);
-            var request = new RestRequest("/v2/subscriptions", Method.Post);
-            request.AddHeader("Content-Type", "application/json");
-            request.AddHeader("fiware-service", "smart");
-            request.AddHeader("fiware-servicepath", "/");
+            using var client = new HttpClient();
+            var url = $"http://{host}:1026/v2/subscriptions";
 
             var body = new
             {
@@ -208,9 +213,12 @@ namespace SitePBL.DAO
                 }
             };
 
-            string jsonBody = JsonSerializer.Serialize(body);
-            request.AddStringBody(jsonBody, DataFormat.Json);
-            await client.ExecuteAsync(request);
+            var json = JsonSerializer.Serialize(body);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            content.Headers.Add("fiware-service", "smart");
+            content.Headers.Add("fiware-servicepath", "/");
+
+            await client.PostAsync(url, content);
         }
     }
 }
