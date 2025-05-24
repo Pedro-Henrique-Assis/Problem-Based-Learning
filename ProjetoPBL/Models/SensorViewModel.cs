@@ -6,6 +6,7 @@
         public string descricaoSensor { get; set; }
         public string localInstalacao { get; set; }
         public decimal valorInstalacao { get; set; }
+        public DateTime dataInstacao { get; set; }
 
     }
 }

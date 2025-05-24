@@ -1,0 +1,44 @@
+﻿<!-- SensorCadastro.cshtml -->
+@model ProjetoPBL.Models.SensorViewModel
+@{
+    ViewData["Title"] = ViewBag.operacao == "I" ? "Cadastro de Sensores" : "Edição de Sensores";
+}
+
+<link rel="stylesheet" href="~/css/sensorForm.css" />
+
+<div class="wrapper">
+    <div class="title">@ViewData["Title"]</div>
+    <form method="post" enctype="multipart/form-data" action="Save">
+        <input type="hidden" name="Operacao" value="@ViewBag.operacao" />
+        <input type="hidden" name="id" value="@Model.id" />
+
+        <div class="field">
+            <input asp-for="nomeSensor" required />
+            <label>Nome do Sensor</label>
+        </div>
+
+        <div class="field">
+            <input asp-for="descricaoSensor" required />
+            <label>Descrição</label>
+        </div>
+
+        <div class="field">
+            <input asp-for="localInstalacao" required />
+            <label>Local de Instalação</label>
+        </div>
+
+        <div class="field">
+            <input asp-for="valorInstalacao" type="number" step="0.01" required />
+            <label>Valor de Instalação</label>
+        </div>
+
+        <div class="field">
+            <input asp-for="dataInstacao" type="date" required />
+            <label>Data de Instalação</label>
+        </div>
+
+        <div class="field">
+            <input type="submit" value="Salvar" />
+        </div>
+    </form>
+</div>

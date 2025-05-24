@@ -54,7 +54,7 @@ namespace ProjetoPBL
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Login}/{action=Index}/{id?}");
+                    pattern: "{controller=Sensor}/{action=Create}/{id?}");
             });
         }
     }
