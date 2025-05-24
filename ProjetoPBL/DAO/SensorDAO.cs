@@ -17,7 +17,7 @@ namespace ProjetoPBL.DAO
         protected override void SetTabela()
         {
             Tabela = "sensor"; // nome da tabela no banco
-            NomeSpListagem = "spListagem_sensor"; // se você tiver essa SP criada
+            NomeSpListagem = "spListagem"; // se você tiver essa SP criada
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace ProjetoPBL.DAO
             parametros.Add(new SqlParameter("descricaoSensor", sensor.descricaoSensor));
             parametros.Add(new SqlParameter("localInstalacao", sensor.localInstalacao));
             parametros.Add(new SqlParameter("valorInstalacao", sensor.valorInstalacao));
-            parametros.Add(new SqlParameter("dataInstacao", sensor.dataInstalacao));
+            parametros.Add(new SqlParameter("dataInstalacao", sensor.dataInstalacao));
 
             return parametros.ToArray();
         }
@@ -46,18 +46,19 @@ namespace ProjetoPBL.DAO
         /// </summary>
         /// <param name="registro">Linha de dados da tabela</param>
         /// <returns>Objeto SensorViewModel</returns>
-        //protected override SensorViewModel MontarModel(DataRow registro)
-        //{
-        //    return new SensorViewModel
-        //    {
-        //        Id = Convert.ToInt32(registro["id"]),
-        //        nomeSensor = registro["nomeSensor"].ToString(),
-        //        descricaoSensor = registro["descricaoSensor"].ToString(),
-        //        localInstalacao = registro["localInstalacao"].ToString(),
-        //        valorInstalacao = Convert.ToDecimal(registro["valorInstalacao"]),
-        //        dataInstacao = Convert.ToDateTime(registro["dataInstalacao"])
-        //    };
-        //}
+        protected override SensorViewModel MontaModel(DataRow registro)
+        {
+            return new SensorViewModel
+            {
+                Id = Convert.ToInt32(registro["id"]),
+                nomeSensor = registro["nomeSensor"].ToString(),
+                descricaoSensor = registro["descricaoSensor"].ToString(),
+                localInstalacao = registro["localInstalacao"].ToString(),
+                valorInstalacao = Convert.ToDecimal(registro["valorInstalacao"]),
+                dataInstalacao = Convert.ToDateTime(registro["dataInstalacao"])
+            };
+        }
+
 
         /// <summary>
         /// Verifica se já existe um sensor com o mesmo nome
@@ -69,11 +70,6 @@ namespace ProjetoPBL.DAO
             SqlParameter[] sp = new SqlParameter[] { new SqlParameter("nomeSensor", nomeSensor) };
             DataTable dt = HelperDAO.ExecutaProcSelect("sp_verificar_sensor", sp);
             return Convert.ToInt32(dt.Rows[0]["cont"]);
-        }
-
-        protected override SensorViewModel MontaModel(DataRow registro)
-        {
-            throw new NotImplementedException();
         }
     }
 }

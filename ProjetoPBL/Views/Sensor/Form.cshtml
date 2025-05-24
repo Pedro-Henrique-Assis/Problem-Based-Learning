@@ -4,13 +4,13 @@
     ViewData["Title"] = ViewBag.operacao == "I" ? "Cadastro de Sensores" : "Edição de Sensores";
 }
 
-<link rel="stylesheet" href="~/css/sensorForm.css" />
+<link rel="stylesheet" href="~/css/cadastroSensor.css" />
 
 <div class="wrapper">
     <div class="title">@ViewData["Title"]</div>
-    <form method="post" enctype="multipart/form-data" action="Save">
+    <form asp-action="Save" asp-controller="Sensor" method="post" enctype="multipart/form-data">
         <input type="hidden" name="Operacao" value="@ViewBag.operacao" />
-        <input type="hidden" name="id" value="@Model.id" />
+        <input type="hidden" name="id" value="@Model.Id" />
 
         <div class="field">
             <input asp-for="nomeSensor" required />
