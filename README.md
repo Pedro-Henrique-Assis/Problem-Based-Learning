@@ -172,41 +172,70 @@ GO
 ### 🌡️ `sensor`
 
 ```sql
-CREATE PROCEDURE sp_verificar_sensor (@nomeSensor VARCHAR(100))
+-- Verifica se já existe um sensor com o mesmo nome
+CREATE PROCEDURE sp_verificar_sensor (
+    @nomeSensor VARCHAR(100)
+)
 AS
 BEGIN
-    SELECT COUNT(*) AS cont FROM sensor WHERE nomeSensor = @nomeSensor
+    SELECT COUNT(*) AS cont
+    FROM sensor
+    WHERE nomeSensor = @nomeSensor;
 END
 GO
 
+-- Insere um novo sensor
 CREATE PROCEDURE spInsert_sensor (
-    @id INT, @nomeSensor VARCHAR(100), @descricaoSensor VARCHAR(255),
-    @localInstalacao VARCHAR(100), @valorInstalacao DECIMAL(10,2), @dataInstalacao DATETIME
+    @id INT,
+    @nomeSensor VARCHAR(100),
+    @descricaoSensor VARCHAR(255),
+    @localInstalacao VARCHAR(100),
+    @valorInstalacao DECIMAL(10,2),
+    @dataInstalacao DATETIME
 )
 AS
 BEGIN
-    INSERT INTO sensor VALUES (
-        @id, @nomeSensor, @descricaoSensor,
-        @localInstalacao, @valorInstalacao, @dataInstalacao
+    INSERT INTO sensor (
+        id,
+        nomeSensor,
+        descricaoSensor,
+        localInstalacao,
+        valorInstalacao,
+        dataInstalacao
     )
+    VALUES (
+        @id,
+        @nomeSensor,
+        @descricaoSensor,
+        @localInstalacao,
+        @valorInstalacao,
+        @dataInstalacao
+    );
 END
 GO
 
+-- Atualiza um sensor existente
 CREATE PROCEDURE spUpdate_sensor (
-    @id INT, @nomeSensor VARCHAR(100), @descricaoSensor VARCHAR(255),
-    @localInstalacao VARCHAR(100), @valorInstalacao DECIMAL(10,2), @dataInstalacao DATETIME
+    @id INT,
+    @nomeSensor VARCHAR(100),
+    @descricaoSensor VARCHAR(255),
+    @localInstalacao VARCHAR(100),
+    @valorInstalacao DECIMAL(10,2),
+    @dataInstalacao DATETIME
 )
 AS
 BEGIN
-    UPDATE sensor SET
+    UPDATE sensor
+    SET
         nomeSensor = @nomeSensor,
         descricaoSensor = @descricaoSensor,
         localInstalacao = @localInstalacao,
         valorInstalacao = @valorInstalacao,
         dataInstalacao = @dataInstalacao
-    WHERE id = @id
+    WHERE id = @id;
 END
 GO
+
 ```
 
 
