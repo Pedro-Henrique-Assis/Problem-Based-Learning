@@ -49,6 +49,18 @@ namespace ProjetoPBL.Controllers
                 model.Id = DAO.ProximoId();
         }
 
+        /// <summary>
+        /// Determina a ação de redirecionamento após a operação Save ser bem-sucedida.
+        /// O comportamento padrão é redirecionar para a NomeViewIndex.
+        /// Pode ser sobrescrito em classes filhas para personalizar o redirecionamento.
+        /// </summary>
+        /// <param name="operacao">A operação realizada ("I" para Insert, "A" para Update).</param>
+        /// <returns>O IActionResult para o redirecionamento.</returns>
+        protected virtual IActionResult GetSaveRedirectAction(string operacao)
+        {
+            return RedirectToAction(NomeViewIndex);
+        }
+
         public virtual IActionResult Save(T model, string Operacao)
         {
             try
@@ -66,7 +78,7 @@ namespace ProjetoPBL.Controllers
                         DAO.Insert(model);
                     else
                         DAO.Update(model);
-                    return RedirectToAction(NomeViewIndex);
+                    return GetSaveRedirectAction(Operacao);
                 }
             }
             catch (Exception erro)

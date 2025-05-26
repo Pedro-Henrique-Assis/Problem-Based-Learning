@@ -19,6 +19,27 @@ namespace ProjetoPBL.Controllers
             ExigeAutenticacao = false;
         }
 
+        /// <summary>
+        /// Sobrescreve o método de redirecionamento para o UsuarioController.
+        /// Se a operação for de Inserção ("I"), redireciona para a tela de Login.
+        /// Caso contrário, mantém o comportamento padrão da PadraoController.
+        /// </summary>
+        /// <param name="operacao">A operação realizada ("I" para Insert, "A" para Update).</param>
+        /// <returns>O IActionResult para o redirecionamento.</returns>
+        protected override IActionResult GetSaveRedirectAction(string operacao)
+        {
+            if (operacao == "I")
+            {
+                // Redireciona para Login/Index especificamente na inserção de usuário
+                return RedirectToAction("Index", "Login");
+            }
+            else
+            {
+                // Para outras operações (como Update), usa o comportamento padrão
+                return base.GetSaveRedirectAction(operacao);
+            }
+        }
+
         protected override void ValidaDados(UsuarioViewModel usuario, string operacao)
         {
             bool usuarioJaExiste = false;
