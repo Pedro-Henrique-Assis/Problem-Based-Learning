@@ -16,8 +16,11 @@ namespace ProjetoPBL.DAO
         /// </summary>
         protected override void SetTabela()
         {
-            Tabela = "sensor"; // nome da tabela no banco
-            NomeSpListagem = "spListagem"; // se você tiver essa SP criada
+            Tabela = "sensor";
+            NomeSpListagem = "spListagem";
+            NomeSpInsert = "spInsert_sensor";
+            NomeSpUpdate = "spUpdate_sensor";
+
         }
 
         /// <summary>

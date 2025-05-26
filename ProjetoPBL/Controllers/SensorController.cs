@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ProjetoPBL.DAO;
 using ProjetoPBL.Models;
 using System;
@@ -22,14 +21,14 @@ namespace ProjetoPBL.Controllers
             if (!await HelperFiwareDAO.VerificarServer(HelperFiwareDAO.host))
             {
                 ModelState.AddModelError("nomeSensor", "Servidor FIWARE indisponível no momento.");
+                return;
             }
 
-            if (ModelState.IsValid && operacao == "I")
+            if (operacao == "I")
             {
                 await HelperFiwareDAO.CriarSensorTemperatura(HelperFiwareDAO.host, model.nomeSensor);
             }
         }
-
 
         /// <summary>
         /// Valida os dados do formulário antes de inserir/editar
@@ -57,30 +56,45 @@ namespace ProjetoPBL.Controllers
             if (model.dataInstalacao > DateTime.Now)
                 ModelState.AddModelError("dataInstalacao", "A data de instalação não pode estar no futuro.");
 
+            // Validação externa só se as validações locais passarem
             if (ModelState.IsValid && operacao == "I")
                 ValidarDadosFiware(model, operacao).GetAwaiter().GetResult();
         }
 
         /// <summary>
-        /// Endpoint que permite trocar a visualização entre tipos de malha
+        /// Sobrescreve Save para adicionar mensagens com TempData
         /// </summary>
-        //public IActionResult TrocaMalha(string malha)
-        //{
-        //    ViewBag.Malha = malha;
-        //    return View("Dashboard", null);
-        //}
+        [HttpPost]
+        public override IActionResult Save(SensorViewModel model, string operacao)
+        {
+            try
+            {
+                ValidaDados(model, operacao);
 
-        /// <summary>
-        /// Retorna as últimas leituras de temperatura do sensor
-        /// </summary>
-        //public async Task<IActionResult> PegarUltimosDados()
-        //{
-        //    string host = "54.225.206.198";
-        //    string sensorId = "03y"; // pode ser substituído por uma variável dinâmica
-        //    int lastN = 50;
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Operacao = operacao;
+                    PreencheDadosParaView(operacao, model);
+                    return View("Form", model);
+                }
 
-        //    var leituras = await HelperFiwareDAO.VerificarDados(host, sensorId, lastN);
-        //    return Json(leituras);
-        //}
+                if (operacao == "I")
+                {
+                    DAO.Insert(model);
+                    TempData["Mensagem"] = "Sensor cadastrado com sucesso!";
+                }
+                else
+                {
+                    DAO.Update(model);
+                    TempData["Mensagem"] = "Sensor atualizado com sucesso!";
+                }
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception erro)
+            {
+                return View("Error", new ErrorViewModel(erro.ToString()));
+            }
+        }
     }
 }

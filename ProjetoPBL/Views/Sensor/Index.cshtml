@@ -1,21 +1,29 @@
-﻿@model List<ProjetoPBL.Models.SensorViewModel>
+﻿@model IEnumerable<ProjetoPBL.Models.SensorViewModel>
 
 @{
-    ViewData["Title"] = "Lista de Sensores";
+    ViewData["Title"] = "Listagem de Sensores";
 }
 
-<h2>Lista de Sensores</h2>
+<h2>@ViewData["Title"]</h2>
 
-<a asp-action="Create" class="btn btn-primary mb-3">Cadastrar Novo Sensor</a>
+@if (TempData["Mensagem"] != null)
+{
+        <div class="alert alert-success" role="alert">
+        @TempData["Mensagem"]
+        </div>
+}
 
-<table class="table table-striped">
+<p>
+    <a asp-action="Create" class="btn btn-primary">Novo Sensor</a>
+</p>
+
+<table class="table table-bordered table-striped">
     <thead>
         <tr>
-            <th>ID</th>
             <th>Nome</th>
             <th>Descrição</th>
             <th>Local</th>
-            <th>Valor</th>
+            <th>Valor de Instalação</th>
             <th>Data de Instalação</th>
             <th>Ações</th>
         </tr>
@@ -23,18 +31,18 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.nomeSensor</td>
-                <td>@item.descricaoSensor</td>
-                <td>@item.localInstalacao</td>
-                <td>@item.valorInstalacao.ToString("C")</td>
-                <td>@item.dataInstalacao.ToString("dd/MM/yyyy")</td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Excluir</a>
-                </td>
-            </tr>
+                <tr>
+                    <td>@item.nomeSensor</td>
+                    <td>@item.descricaoSensor</td>
+                    <td>@item.localInstalacao</td>
+                    <td>@item.valorInstalacao.ToString("C")</td>
+                    <td>@item.dataInstalacao.ToShortDateString()</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger" 
+                           onclick="return confirm('Tem certeza que deseja excluir este sensor?');">Excluir</a>
+                    </td>
+                </tr>
         }
     </tbody>
 </table>

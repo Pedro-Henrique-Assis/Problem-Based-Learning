@@ -15,6 +15,11 @@ namespace ProjetoPBL.DAO
 
         protected string Tabela { get; set; }
         protected string NomeSpListagem { get; set; } = "spListagem";
+
+        // NOVAS propriedades opcionais
+        public string NomeSpInsert { get; set; } = "";
+        public string NomeSpUpdate { get; set; } = "";
+
         protected abstract SqlParameter[] CriaParametros(T model);
         protected abstract T MontaModel(DataRow registro);
         protected abstract void SetTabela();
@@ -23,17 +28,18 @@ namespace ProjetoPBL.DAO
         /// Executa uma stored procedure que insere
         /// um registro no banco de dados
         /// </summary>
-        /// <param name="model">Objeto que será inserido ao banco de dados</param>
-        /// <returns></returns>
         public virtual void Insert(T model)
         {
-            HelperDAO.ExecutaProc("spInsert_" + Tabela, CriaParametros(model));
+            string nomeProc = string.IsNullOrEmpty(NomeSpInsert) ? "spInsert_" + Tabela : NomeSpInsert;
+            HelperDAO.ExecutaProc(nomeProc, CriaParametros(model));
         }
 
         public virtual void Update(T model)
         {
-            HelperDAO.ExecutaProc("spUpdate_" + Tabela, CriaParametros(model));
+            string nomeProc = string.IsNullOrEmpty(NomeSpUpdate) ? "spUpdate_" + Tabela : NomeSpUpdate;
+            HelperDAO.ExecutaProc(nomeProc, CriaParametros(model));
         }
+
         public virtual void Delete(int id)
         {
             var p = new SqlParameter[]
@@ -57,6 +63,7 @@ namespace ProjetoPBL.DAO
             else
                 return MontaModel(tabela.Rows[0]);
         }
+
         public virtual int ProximoId()
         {
             var p = new SqlParameter[]
@@ -66,6 +73,7 @@ namespace ProjetoPBL.DAO
             var tabela = HelperDAO.ExecutaProcSelect("spProximoId", p);
             return Convert.ToInt32(tabela.Rows[0][0]);
         }
+
         public virtual List<T> Listagem()
         {
             var p = new SqlParameter[]

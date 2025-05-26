@@ -66,7 +66,7 @@ namespace ProjetoPBL.Controllers
                         DAO.Insert(model);
                     else
                         DAO.Update(model);
-                    return RedirectToAction("Index", "Login");
+                    return RedirectToAction(NomeViewIndex);
                 }
             }
             catch (Exception erro)

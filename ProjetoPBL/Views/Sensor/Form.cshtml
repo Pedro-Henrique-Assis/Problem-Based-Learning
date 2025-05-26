@@ -1,40 +1,45 @@
-﻿<!-- SensorCadastro.cshtml -->
-@model ProjetoPBL.Models.SensorViewModel
+﻿@model ProjetoPBL.Models.SensorViewModel
 @{
-    ViewData["Title"] = ViewBag.operacao == "I" ? "Cadastro de Sensores" : "Edição de Sensores";
+    ViewData["Title"] = ViewBag.Operacao == "I" ? "Cadastro de Sensores" : "Edição de Sensores";
 }
 
 <link rel="stylesheet" href="~/css/cadastroSensores.css" />
 
 <div class="wrapper">
     <div class="title">@ViewData["Title"]</div>
+
     <form asp-action="Save" asp-controller="Sensor" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="Operacao" value="@ViewBag.operacao" />
-        <input type="hidden" name="id" value="@Model.Id" />
+        <input type="hidden" name="Operacao" value="@ViewBag.Operacao" />
+        <input type="hidden" name="Id" value="@Model.Id" />
 
         <div class="field">
             <input asp-for="nomeSensor" required />
             <label>Nome do Sensor</label>
+            <span asp-validation-for="nomeSensor" class="text-danger"></span>
         </div>
 
         <div class="field">
             <input asp-for="descricaoSensor" required />
             <label>Descrição</label>
+            <span asp-validation-for="descricaoSensor" class="text-danger"></span>
         </div>
 
         <div class="field">
             <input asp-for="localInstalacao" required />
             <label>Local de Instalação</label>
+            <span asp-validation-for="localInstalacao" class="text-danger"></span>
         </div>
 
         <div class="field">
             <input asp-for="valorInstalacao" type="number" step="0.01" required />
             <label>Valor de Instalação</label>
+            <span asp-validation-for="valorInstalacao" class="text-danger"></span>
         </div>
 
         <div class="field">
             <input asp-for="dataInstalacao" type="date" required />
             <label>Data de Instalação</label>
+            <span asp-validation-for="dataInstalacao" class="text-danger"></span>
         </div>
 
         <div class="field">
@@ -42,3 +47,7 @@
         </div>
     </form>
 </div>
+
+@section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+}
