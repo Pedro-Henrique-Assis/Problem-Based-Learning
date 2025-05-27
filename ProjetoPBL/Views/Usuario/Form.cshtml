@@ -1,31 +1,23 @@
 ﻿@model UsuarioViewModel
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = (ViewBag.Operacao == "I" ? "Cadastro" : "Alteração") + " de Usuário!";
 }
 
 @section Styles {
     <link rel="stylesheet" href="~/css/cadastroUsuario.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 }
 
 <div class="container-externo-forms">
 
     <form action="Save" enctype="multipart/form-data" method="post">
-        <div class="title">Realize o seu Cadastro!</div>
+        <div class="title">@ViewData["Title"]</div>
 
         <div class="form-body">
             <input type="hidden" name="Operacao" value="@ViewBag.Operacao" />
-
-            @* <label for="Id">Id</label> *@
-            @if (ViewBag.Operacao == "I")
-            {
-                <input asp-for="Id" type="hidden" readonly />
-            }
-            else
-            {
-                <input asp-for="Id" type="hidden" readonly />
-            }
-            <span asp-validation-for="Id"></span>
-            <br />
+            <input asp-for="Id" type="hidden" readonly />
+            <input type="hidden" asp-for="RemoverImagemAtual" id="RemoverImagemAtual" value="false" />
 
             <label for="Nome">Insira o seu nome completo</label>
             <input asp-for="Nome" />
@@ -85,10 +77,12 @@
             <div class="image-upload-wrapper">
                 <label for="Imagem" class="botao-upload">
                     <i class="fas fa-upload"></i> Escolha sua foto de perfil
-                    @* Ícone opcional, requer Font Awesome ou similar *@
                 </label>
-                <input type="file" name="Imagem" id="Imagem" onchange="exibirImagem()">
-                <img id="imgPreview" src="data:image/jpeg;base64,@Model.ImagemEmBase64" width="100">
+                <input asp-for="Imagem" id="Imagem" type="file" accept="image/*" />
+                <img id="imgPreview" src="data:image/jpeg;base64,@Model.ImagemEmBase64" alt="Prévia" width="100">
+                <button type="button" id="removeImageBtn" class="btn-remover-imagem">
+                    <i class="fas fa-times"></i> Remover
+                </button>
                 <span asp-validation-for="Imagem"></span>
             </div>
 
@@ -100,8 +94,66 @@
     </form>
 </div>
 
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const inputImagem = document.getElementById("Imagem");
+            const imgPreview = document.getElementById("imgPreview");
+            const nomeArquivoSpan = document.getElementById("nome-arquivo");
+            const removeImageBtn = document.getElementById("removeImageBtn");
+            const removerImagemAtualInput = document.getElementById("RemoverImagemAtual");
 
-<script>
+            const defaultPreviewSrc = "data:image/jpeg;base64,@Model.ImagemEmBase64";
+            const hasExistingImage = defaultPreviewSrc && !defaultPreviewSrc.endsWith("base64,");
+
+            // Função para atualizar a UI (Interface do Usuário)
+            function updateUI(showPreview, showRemoveBtn, fileName) {
+                imgPreview.style.display = showPreview ? 'inline-block' : 'none';
+                removeImageBtn.style.display = showRemoveBtn ? 'inline-block' : 'none';
+                nomeArquivoSpan.textContent = fileName || "Nenhum arquivo selecionado";
+
+                if (showPreview && imgPreview.src.endsWith("base64,")) {
+                    imgPreview.style.display = 'none'; // Não mostrar se for base64 vazia
+                }
+            }
+
+            // Evento ao selecionar um arquivo
+            inputImagem.addEventListener('change', function () {
+                if (inputImagem.files && inputImagem.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        imgPreview.src = e.target.result;
+                        updateUI(true, true, inputImagem.files[0].name);
+                    };
+                    reader.readAsDataURL(inputImagem.files[0]);
+                    removerImagemAtualInput.value = "false";
+                }
+            });
+
+            // Evento ao clicar no botão de remover
+            removeImageBtn.addEventListener('click', function () {
+                inputImagem.value = null; // Limpa o input
+                imgPreview.src = '';      // Limpa a pré-visualização
+                updateUI(false, false, null); // Atualiza a UI
+                removerImagemAtualInput.value = "true"; // Marca para remoção
+            });
+
+            // Configuração inicial ao carregar a página
+            if (hasExistingImage) {
+                 imgPreview.src = defaultPreviewSrc;
+                 updateUI(true, true, "Imagem atual carregada");
+            } else {
+                 updateUI(false, false, null);
+            }
+        });
+    </script>
+}
+
+
+@* <script>
         function exibirImagem() {
         var input = document.getElementById("Imagem");
         var preview = document.getElementById("imgPreview");
@@ -135,4 +187,4 @@
             preview.style.display = 'none';
         }
     });
-</script>
+</script> *@

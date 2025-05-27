@@ -7,23 +7,23 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* Container agora SÓ centraliza */
+/* Container que centraliza */
 .container-externo-forms {
     display: flex;
-    align-items: center; /* Alinha verticalmente ao centro */
-    justify-content: center; /* Alinha horizontalmente ao centro */
-    min-height: 100vh; /* Ocupa a altura da tela */
-    width: 100%; /* Ocupa a largura */
-    padding: 20px; /* Espaço para o card não colar nas bordas */
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 20px;
 }
 
     /* O Form se torna o Card visual */
     .container-externo-forms form {
-        width: 900px; /* Defina a largura desejada para o seu card */
-        background: #fff; /* Fundo branco para o card */
+        width: 900px;
+        background: #fff;
         box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
         border-radius: 15px;
-        overflow: hidden; /* MUITO IMPORTANTE: Garante que o title respeite as bordas */
+        overflow: hidden; /* Garante que o title respeite as bordas */
         text-align: left; /* Garante que o conteúdo do form alinhe à esquerda */
     }
 
@@ -64,45 +64,41 @@
         /* Estilo para os spans de validação (exceto o da imagem) */
         .container-externo-forms form span:not([asp-validation-for="Imagem"]) {
             display: block; /* Faz o span ocupar sua própria linha */
-            color: red; /* Cor para mensagens de erro */
-            font-size: 0.85em; /* Tamanho da fonte menor */
-            min-height: 1.2em; /* Garante altura mínima para não 'pular' o layout */
-            margin-bottom: 10px; /* Espaço maior após cada grupo de campo */
+            color: red;
+            font-size: 0.85em;
+            min-height: 1.2em;
+            margin-bottom: 10px;
         }
 
-/* --- Seção de Upload de Imagem (Exceção) --- */
+/* --- Seção de Upload de Imagem --- */
 
 /* Garante que o input[type="file"] e a imagem fiquem na mesma linha */
 #Imagem {
     display: inline-block;
-    width: auto; /* Reseta a largura para o padrão */
+    width: auto;
 }
 
 #imgPreview {
     display: inline-block;
     vertical-align: middle; /* Alinha a imagem verticalmente com o input */
-    margin-left: 10px; /* Espaço entre o input e a imagem */
-    margin-bottom: 10px; /* Espaço abaixo */
-    border: 1px solid #ddd; /* Opcional: borda na preview */
+    margin-left: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
 }
 
-/* Garante que o span da imagem fique na mesma linha (ou abaixo, se preferir) */
+/* Garante que o span da imagem fique na mesma linha */
 span[asp-validation-for="Imagem"] {
-    display: inline-block; /* Ou 'block' se quiser abaixo */
+    display: inline-block;
     vertical-align: middle;
     color: red;
     font-size: 0.85em;
     margin-left: 10px;
-    margin-bottom: 10px; /* Espaço abaixo */
+    margin-bottom: 10px;
 }
 
-/* Opcional: Se os <br> estiverem causando muito espaço, você pode ocultá-los */
-/* .container-externo-forms form br {
-    display: none;
-} */
-/* Ou ajustar a margem deles se os mantiver */
+
 .container-externo-forms form br {
-    display: none; /* Recomendo ocultar e controlar espaço com margin-bottom */
+    display: none;
 }
 
 /* Estilo para o botão de submit */
@@ -122,14 +118,14 @@ span[asp-validation-for="Imagem"] {
 
 /* Wrapper para a área de upload */
 .image-upload-wrapper {
-    display: flex; /* Alinha os itens na horizontal */
-    align-items: center; /* Centraliza verticalmente */
-    flex-wrap: wrap; /* Permite quebrar linha se não couber */
-    margin-bottom: 15px; /* Espaçamento inferior */
-    border: 1px dashed #ccc; /* Opcional: Borda para delimitar a área */
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    border: 1px dashed #ccc;
     padding: 15px;
     border-radius: 5px;
-    background-color: #f9f9f9; /* Opcional: Fundo leve */
+    background-color: #f9f9f9;
 }
 
     /* Esconde o input de arquivo original */
@@ -141,15 +137,16 @@ span[asp-validation-for="Imagem"] {
     .image-upload-wrapper .botao-upload {
         display: inline-block;
         padding: 10px 20px;
-        background: linear-gradient(-135deg, #717c86, #3a3f44); /* Um gradiente mais sóbrio */
+        background: #6c757d;
         color: #fff;
-        border-radius: 5px;
+        border-radius: .25rem;
         cursor: pointer; /* Muda o cursor para indicar que é clicável */
         font-weight: 500;
-        font-size: 16px;
+        font-size: 1rem;
         text-align: center;
-        transition: background 0.3s ease, transform 0.2s ease;
-        margin-right: 15px; /* Espaço entre o botão e o nome/imagem */
+        transition: background-color .15s ease-in-out;
+        margin-right: 15px;
+        margin-bottom: 5px;
     }
 
         /* Efeito ao passar o mouse */
@@ -162,7 +159,31 @@ span[asp-validation-for="Imagem"] {
             transform: scale(0.97);
         }
 
-    /* Estilo para o nome do arquivo (Opcional) */
+    /* Botão para remover a imagem */
+    .image-upload-wrapper .btn-remover-imagem {
+        display: inline-flex; /* Use flex para alinhar o ícone e o texto */
+        align-items: center;
+        padding: .375rem .75rem;
+        font-size: 0.875rem;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: .25rem;
+        cursor: pointer;
+        margin-left: 10px;
+        margin-bottom: 5px;
+        transition: background-color .15s ease-in-out;
+    }
+
+        .image-upload-wrapper .btn-remover-imagem i {
+            margin-right: 5px;
+        }
+
+        .image-upload-wrapper .btn-remover-imagem:hover {
+            background-color: #c82333;
+        }
+
+    /* Estilo para o nome do arquivo */
     .image-upload-wrapper #nome-arquivo {
         font-size: 14px;
         color: #555;
@@ -177,14 +198,13 @@ span[asp-validation-for="Imagem"] {
 
     /* Estilo para a pré-visualização da imagem */
     .image-upload-wrapper #imgPreview {
-        width: 60px; /* Reduzimos um pouco para caber melhor */
+        width: 60px;
         height: 60px;
         object-fit: cover;
         border: 1px solid #ddd;
         border-radius: 5px;
         margin-right: 15px;
-        vertical-align: middle; /* Ajuda no alinhamento */
-        /* Esconde se não houver imagem */
+        vertical-align: middle;
         display: none; /* Começa escondido, será mostrado pelo JS */
     }
 

@@ -73,23 +73,45 @@ namespace ProjetoPBL.Controllers
             foreach (var usuarioCadastrado in lista)
             {
                 if (usuarioCadastrado.LoginUsuario == usuario.LoginUsuario)
+                {
                     usuarioJaExiste = true;
+                    break;
+                }
+                    
             }
 
             if (usuarioJaExiste)
                 ModelState.AddModelError("LoginUsuario", "Usuário já cadastrado");
 
-            if (ModelState.IsValid)
+            // Processamento da Imagem
+            if (ModelState.IsValid) // Processa imagem apenas se o restante do modelo for válido
             {
-                //Na alteração, se não for informada a imagem, será mantida a que já estava salva.
-                if (operacao == "A" && usuario.Imagem == null)
+                if (usuario.RemoverImagemAtual)
                 {
-                    UsuarioViewModel u = DAO.Consulta(usuario.Id);
-                    usuario.ImagemEmByte = u.ImagemEmByte;
+                    usuario.ImagemEmByte = null;
+                    usuario.Imagem = null; // Garante que o IFormFile também seja nulo
                 }
-                else
+                else if (usuario.Imagem != null) // Nova imagem foi enviada
                 {
                     usuario.ImagemEmByte = ConvertImageToByte(usuario.Imagem);
+                }
+                else if (operacao == "A") // É uma alteração e nenhuma nova imagem foi enviada E não é para remover
+                {
+                    // Mantém a imagem existente
+                    UsuarioViewModel u = DAO.Consulta(usuario.Id);
+                    if (u != null) // Verifica se o usuário consultado não é nulo
+                    {
+                        usuario.ImagemEmByte = u.ImagemEmByte;
+                    }
+                    else
+                    {
+                        // Se não encontrar o usuário (improvável aqui, mas por segurança)
+                        usuario.ImagemEmByte = null;
+                    }
+                }
+                else // É uma inserção e nenhuma imagem foi enviada
+                {
+                    usuario.ImagemEmByte = null;
                 }
             }
         }

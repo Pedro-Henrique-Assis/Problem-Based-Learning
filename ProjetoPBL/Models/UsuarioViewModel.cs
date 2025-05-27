@@ -43,6 +43,11 @@ namespace ProjetoPBL.Models
                     return string.Empty;
             }
         }
+
+        /// <summary>
+        /// Indica se o usuário solicitou a remoção da imagem de perfil atual.
+        /// </summary>
+        public bool RemoverImagemAtual { get; set; } = false;
     }
 }
 
