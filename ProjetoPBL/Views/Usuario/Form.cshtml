@@ -1,7 +1,7 @@
 ﻿@model UsuarioViewModel
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = (ViewBag.Operacao == "I" ? "Cadastro" : "Alteração") + " de Usuário!";
+    ViewData["Title"] = (ViewBag.Operacao == "I" ? "Cadastro" : "Alteração") + " de Usuário";
 }
 
 @section Styles {
@@ -11,7 +11,7 @@
 
 <div class="container-externo-forms">
 
-    <form action="Save" enctype="multipart/form-data" method="post">
+    <form asp-controller="Usuario" asp-action="Save" enctype="multipart/form-data" method="post">
         <div class="title">@ViewData["Title"]</div>
 
         <div class="form-body">
@@ -39,28 +39,35 @@
             <span asp-validation-for="SexoId"></span>
             <br />
 
-            <label for="Cep">Insira o cep</label>
-            <input asp-for="Cep" />
-            <span asp-validation-for="Cep"></span>
+            <div class="cep-wrapper">
+                <div class="cep-input">
+                    <label for="Cep">Insira o cep</label>
+                    <input asp-for="Cep" id="cep" />
+                    <span asp-validation-for="Cep"></span>
+                </div>
+                <div class="cep-button">
+                    <input type="button" name="btnBuscaCEP" value="Buscar" onclick="buscaCEP()" class="btn-busca-cep" />
+                </div>
+            </div>
             <br />
 
             <label for="Logradouro">Insira o endereço</label>
-            <input asp-for="Logradouro" />
+            <input asp-for="Logradouro" id="logradouro" />
             <span asp-validation-for="Logradouro"></span>
             <br />
 
             <label for="Numero">Insira o número da residência</label>
-            <input asp-for="Numero" />
+            <input asp-for="Numero" id="numero" />
             <span asp-validation-for="Numero"></span>
             <br />
 
             <label for="Cidade">Insira a sua cidade</label>
-            <input asp-for="Cidade" />
+            <input asp-for="Cidade" id="cidade" />
             <span asp-validation-for="Cidade"></span>
             <br />
 
             <label for="Estado">Insira o seu Estado</label>
-            <input asp-for="Estado" />
+            <input asp-for="Estado" id="estado" />
             <span asp-validation-for="Estado"></span>
             <br />
 
@@ -70,7 +77,7 @@
             <br />
 
             <label for="Senha">Insira sua senha</label>
-            <input asp-for="Senha" />
+            <input asp-for="Senha" type="password" />
             <span asp-validation-for="Senha"></span>
             <br />
 
@@ -94,11 +101,58 @@
     </form>
 </div>
 
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
+        function buscaCEP() {
+            var cep = document.getElementById("cep").value;
+            cep = cep.replace(/[^0-9]/g, ''); // Removemos tudo que não é dígito
+
+            if (cep.length === 8) { // Verifica se temos 8 dígitos
+                var linkAPI = 'https://viacep.com.br/ws/' + cep + '/json/';
+                $.ajax({
+                    url: linkAPI,
+                    dataType: 'json', // Informa ao jQuery para esperar JSON
+                    beforeSend: function () {
+                        document.getElementById("logradouro").value = '...';
+                        document.getElementById("cidade").value = '...';
+                        document.getElementById("estado").value = '...';
+                    },
+                    success: function (dados) {
+                        if (dados.erro != undefined) { // quando o CEP não existe...
+                            alert('CEP não localizado...');
+                            document.getElementById("logradouro").value = '';
+                            document.getElementById("cidade").value = '';
+                            document.getElementById("estado").value = '';
+                        }
+                        else { // quando o CEP existe
+                            document.getElementById("logradouro").value = dados.logradouro;
+                            document.getElementById("cidade").value = dados.localidade;; // Usa 'localidade' da API para 'cidade'
+                            document.getElementById("estado").value = dados.estado;
+                            $("#numero").focus(); // Foca no campo número após o sucesso
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        alert('Falha ao buscar CEP. Verifique o CEP ou a conexão.');
+                        console.error("Erro ViaCEP:", textStatus, errorThrown);
+                        $("#logradouro").val('');
+                        $("#cidade").val('');
+                        $("#estado").val('');
+                    }
+                });
+            } else if (cep.length > 0) {
+                alert('CEP inválido. Deve conter 8 dígitos.');
+                document.getElementById("logradouro").value = '';
+                document.getElementById("cidade").value = '';
+                document.getElementById("estado").value = '';
+            } else {
+                alert('Por favor, digite um CEP.');
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             const inputImagem = document.getElementById("Imagem");
             const imgPreview = document.getElementById("imgPreview");
@@ -151,40 +205,3 @@
         });
     </script>
 }
-
-
-@* <script>
-        function exibirImagem() {
-        var input = document.getElementById("Imagem");
-        var preview = document.getElementById("imgPreview");
-        var fileNameSpan = document.getElementById("nome-arquivo"); // Pega o span do nome
-
-        // Verifica se há arquivos selecionados
-        if (input.files && input.files[0]) {
-            var oFReader = new FileReader();
-            oFReader.readAsDataURL(input.files[0]);
-
-            oFReader.onload = function (oFREvent) {
-                preview.src = oFREvent.target.result;
-                preview.style.display = 'inline-block'; // Mostra a imagem
-            };
-
-            fileNameSpan.textContent = input.files[0].name; // Mostra o nome do arquivo
-        } else {
-            fileNameSpan.textContent = "Nenhum arquivo selecionado"; // Texto padrão
-            preview.src = ""; // Limpa o src
-            preview.style.display = 'none'; // Esconde a imagem
-        }
-    }
-
-    // Para garantir que a imagem apareça (ou não) ao carregar a página (no caso de edição)
-    document.addEventListener("DOMContentLoaded", function() {
-        var preview = document.getElementById("imgPreview");
-        // Verifica se o src tem algo além do prefixo 'data:image' ou se não está vazio
-        if (preview.src && !preview.src.endsWith("base64,") && preview.src.includes("data:image")) {
-            preview.style.display = 'inline-block';
-        } else {
-            preview.style.display = 'none';
-        }
-    });
-</script> *@

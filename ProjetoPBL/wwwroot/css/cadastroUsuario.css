@@ -41,8 +41,55 @@
 
     /* Adiciona padding ao corpo do formulário */
     .container-externo-forms .form-body {
-        padding: 25px 30px; /* Espaçamento interno (topo/baixo, lados) */
+        padding: 25px 30px;
     }
+
+        .cep-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .cep-input {
+            flex-grow: 1;
+        }
+
+            .cep-input label,
+            .cep-input input,
+            .cep-input span {
+                display: block;
+            }
+
+            .cep-input input {
+                width: 100%;
+            }
+
+            .cep-input span {
+                margin-bottom: 0;
+            }
+
+        .cep-button {
+
+        }
+
+            .cep-button .btn-busca-cep {
+                padding: .5rem 1rem;
+                background-color: #28a745;
+                color: white;
+                border: none;
+                border-radius: .25rem;
+                cursor: pointer;
+                font-size: 1rem;
+                font-weight: 500;
+                height: calc(1.5em + 1rem + 2px);
+                transition: background-color .15s ease-in-out;
+                white-space: nowrap;
+            }
+
+                .cep-button .btn-busca-cep:hover {
+                    background-color: #218838; /* Verde mais escuro no hover */
+                }
 
     /* Mantenha seus estilos anteriores para labels, inputs, etc. */
     .container-externo-forms form label {
@@ -80,7 +127,7 @@
 
 #imgPreview {
     display: inline-block;
-    vertical-align: middle; /* Alinha a imagem verticalmente com o input */
+    vertical-align: middle;
     margin-left: 10px;
     margin-bottom: 10px;
     border: 1px solid #ddd;
