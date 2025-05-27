@@ -47,6 +47,7 @@ namespace ProjetoPBL.Controllers
         {
             if (GeraProximoId && Operacao == "I")
                 model.Id = DAO.ProximoId();
+                
         }
 
         /// <summary>

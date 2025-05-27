@@ -41,7 +41,7 @@
 
             <div>
                 <label>Data de Instalação</label>
-                <input asp-for="dataInstalacao" type="date" required />
+                <input asp-for="dataInstalacao" type="date" value="@Model.dataInstalacao.ToString("yyyy-MM-dd")" required />
                 <span asp-validation-for="dataInstalacao" class="text-danger"></span>
             </div>
 

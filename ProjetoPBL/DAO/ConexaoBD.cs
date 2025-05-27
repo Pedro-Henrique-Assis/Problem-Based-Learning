@@ -5,7 +5,7 @@ namespace ProjetoPBL.DAO
     public static class ConexaoBD
     {
         /// <summary>
-        /// Método Estático que retorna um conexao aberta com o BD
+        /// Método estático que retorna um conexao aberta com o BD
         /// </summary>
         /// <returns>Conexão aberta</returns>
         public static SqlConnection GetConexao()

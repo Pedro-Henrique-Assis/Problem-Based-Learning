@@ -102,5 +102,12 @@ namespace ProjetoPBL.Controllers
                 return View("Error", new ErrorViewModel(erro.ToString()));
             }
         }
+
+        protected override void PreencheDadosParaView(string Operacao, SensorViewModel model)
+        {
+            base.PreencheDadosParaView(Operacao, model);
+            if (Operacao == "I")
+                model.dataInstalacao = DateTime.Now;
+        }
     }
 }
