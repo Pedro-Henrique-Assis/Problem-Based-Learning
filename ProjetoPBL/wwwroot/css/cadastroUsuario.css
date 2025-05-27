@@ -1,2 +1,119 @@
-﻿body {
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Container agora SÓ centraliza */
+.container-externo-forms {
+    display: flex;
+    align-items: center; /* Alinha verticalmente ao centro */
+    justify-content: center; /* Alinha horizontalmente ao centro */
+    min-height: 100vh; /* Ocupa a altura da tela */
+    width: 100%; /* Ocupa a largura */
+    padding: 20px; /* Espaço para o card não colar nas bordas */
+}
+
+    /* O Form se torna o Card visual */
+    .container-externo-forms form {
+        width: 900px; /* Defina a largura desejada para o seu card */
+        background: #fff; /* Fundo branco para o card */
+        box-shadow: 0px 0px 20px rgba(0,0,0,0.3);
+        border-radius: 15px;
+        overflow: hidden; /* MUITO IMPORTANTE: Garante que o title respeite as bordas */
+        text-align: left; /* Garante que o conteúdo do form alinhe à esquerda */
+    }
+
+    /* Estilo do Title (praticamente o mesmo, mas agora dentro do form) */
+    .container-externo-forms .title {
+        font-size: 35px;
+        font-weight: 600;
+        text-align: center;
+        line-height: 100px;
+        color: #fff;
+        user-select: none;
+        border-radius: 15px 15px 0 0;
+        background: linear-gradient(-135deg, #c850c0, #4158d0);
+    }
+
+    /* Adiciona padding ao corpo do formulário */
+    .container-externo-forms .form-body {
+        padding: 25px 30px; /* Espaçamento interno (topo/baixo, lados) */
+    }
+
+    /* Mantenha seus estilos anteriores para labels, inputs, etc. */
+    .container-externo-forms form label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .container-externo-forms form input:not([type="file"]):not([type="submit"]):not([type="hidden"]),
+    .container-externo-forms form select {
+        display: block;
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 5px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+        /* Estilo para os spans de validação (exceto o da imagem) */
+        .container-externo-forms form span:not([asp-validation-for="Imagem"]) {
+            display: block; /* Faz o span ocupar sua própria linha */
+            color: red; /* Cor para mensagens de erro */
+            font-size: 0.85em; /* Tamanho da fonte menor */
+            min-height: 1.2em; /* Garante altura mínima para não 'pular' o layout */
+            margin-bottom: 10px; /* Espaço maior após cada grupo de campo */
+        }
+
+/* --- Seção de Upload de Imagem (Exceção) --- */
+
+/* Garante que o input[type="file"] e a imagem fiquem na mesma linha */
+#Imagem {
+    display: inline-block;
+    width: auto; /* Reseta a largura para o padrão */
+}
+
+#imgPreview {
+    display: inline-block;
+    vertical-align: middle; /* Alinha a imagem verticalmente com o input */
+    margin-left: 10px; /* Espaço entre o input e a imagem */
+    margin-bottom: 10px; /* Espaço abaixo */
+    border: 1px solid #ddd; /* Opcional: borda na preview */
+}
+
+/* Garante que o span da imagem fique na mesma linha (ou abaixo, se preferir) */
+span[asp-validation-for="Imagem"] {
+    display: inline-block; /* Ou 'block' se quiser abaixo */
+    vertical-align: middle;
+    color: red;
+    font-size: 0.85em;
+    margin-left: 10px;
+    margin-bottom: 10px; /* Espaço abaixo */
+}
+
+/* Opcional: Se os <br> estiverem causando muito espaço, você pode ocultá-los */
+/* .container-externo-forms form br {
+    display: none;
+} */
+/* Ou ajustar a margem deles se os mantiver */
+.container-externo-forms form br {
+    display: none; /* Recomendo ocultar e controlar espaço com margin-bottom */
+}
+
+/* Estilo para o botão de submit */
+.container-externo-forms form input[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    margin-top: 20px; /* Espaço acima do botão */
+    margin-bottom: 40px;
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
 }
