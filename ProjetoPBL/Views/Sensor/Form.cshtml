@@ -1,14 +1,14 @@
-﻿@model ProjetoPBL.Models.SensorViewModel
+﻿@model SensorViewModel
 @{
     ViewData["Title"] = ViewBag.Operacao == "I" ? "Cadastro de Sensores" : "Edição de Sensores";
 }
 
-<link rel="stylesheet" href="~/css/cadastroSensores.css" />
+<link rel="stylesheet" href="~/css/cadastroSensores.css" asp-append-version="true" />
 
 <div class="wrapper">
     <div class="title">@ViewData["Title"]</div>
 
-    <form asp-action="Save" asp-controller="Sensor" method="post" enctype="multipart/form-data">
+    <form asp-controller="Sensor" asp-action="Save" method="post">
         <input type="hidden" name="Operacao" value="@ViewBag.Operacao" />
         <input type="hidden" name="Id" value="@Model.Id" />
 
@@ -43,7 +43,7 @@
         </div>
 
         <div class="field">
-            <input type="submit" value="Salvar" />
+            <input type="submit" value="Cadastrar" />
         </div>
     </form>
 </div>

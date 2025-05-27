@@ -11,6 +11,7 @@ namespace ProjetoPBL.Controllers
         public SensorController()
         {
             DAO = new SensorDAO();
+            GeraProximoId = true;
         }
 
         /// <summary>
@@ -69,6 +70,11 @@ namespace ProjetoPBL.Controllers
         {
             try
             {
+                if (operacao == "I" && model.Id == 0 && GeraProximoId)
+                {
+                    PreencheDadosParaView(operacao, model); // Garante que o ID seja gerado se não veio do GET
+                }
+
                 ValidaDados(model, operacao);
 
                 if (!ModelState.IsValid)
@@ -89,7 +95,7 @@ namespace ProjetoPBL.Controllers
                     TempData["Mensagem"] = "Sensor atualizado com sucesso!";
                 }
 
-                return RedirectToAction("Index");
+                return GetSaveRedirectAction(operacao);
             }
             catch (Exception erro)
             {
