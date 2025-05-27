@@ -50,6 +50,7 @@ CREATE TABLE usuarios (
     senha VARCHAR(50),
     sexoId INT,
     imagem VARBINARY(MAX),
+    IsAdmin BIT NOT NULL DEFAULT 0,
     FOREIGN KEY (sexoId) REFERENCES sexos(id)
 );
 ```
@@ -108,13 +109,13 @@ CREATE PROCEDURE spInsert_usuarios (
     @id INT, @nome VARCHAR(MAX), @email VARCHAR(MAX), @data_nascimento DATETIME,
     @cep VARCHAR(MAX), @logradouro VARCHAR(MAX), @numero INT, @cidade VARCHAR(MAX),
     @estado VARCHAR(MAX), @loginUsuario VARCHAR(MAX), @senha VARCHAR(MAX),
-    @sexoId INT, @imagem VARBINARY(MAX)
+    @sexoId INT, @imagem VARBINARY(MAX), @IsAdmin BIT
 )
 AS
 BEGIN
     INSERT INTO usuarios VALUES
     (@id, @nome, @email, @data_nascimento, @cep, @logradouro, @numero, @cidade,
-     @estado, @loginUsuario, @senha, @sexoId, @imagem)
+     @estado, @loginUsuario, @senha, @sexoId, @imagem, @IsAdmin)
 END
 GO
 
@@ -122,7 +123,7 @@ CREATE PROCEDURE spUpdate_usuarios (
     @id INT, @nome VARCHAR(MAX), @email VARCHAR(MAX), @data_nascimento DATETIME,
     @cep VARCHAR(MAX), @logradouro VARCHAR(MAX), @numero INT, @cidade VARCHAR(MAX),
     @estado VARCHAR(MAX), @loginUsuario VARCHAR(MAX), @senha VARCHAR(MAX),
-    @sexoId INT, @imagem VARBINARY(MAX)
+    @sexoId INT, @imagem VARBINARY(MAX), @IsAdmin BIT
 )
 AS
 BEGIN
@@ -138,8 +139,32 @@ BEGIN
         loginUsuario = @loginUsuario,
         senha = @senha,
         sexoId = @sexoId,
-        imagem = @imagem
+        imagem = @imagem,
+        IsAdmin = @IsAdmin
     WHERE id = @id
+END
+GO
+
+CREATE PROCEDURE spConsultaAvancadaUsuarios
+( 
+	@nome varchar(max), 
+	@estado varchar(max),
+	@sexoId int,
+	@dataInicial datetime, 
+	@dataFinal datetime) 
+AS 
+BEGIN 
+	DECLARE @categIni INT 
+	DECLARE @categFim INT 
+	SET @categIni = CASE @sexoId WHEN 0 THEN 0 ELSE @sexoId END
+	SET @categFim = CASE @sexoId WHEN 0 THEN 999999 ELSE @sexoId END 
+	SELECT usuarios.*, sexos.nome AS 'NomeSexo' 
+	FROM usuarios 
+	INNER JOIN sexos ON usuarios.sexoId = sexos.Id 
+	WHERE usuarios.nome LIKE '%' + @nome + '%' AND
+	usuarios.estado LIKE '%' + @estado + '%' AND
+	usuarios.data_nascimento BETWEEN @dataInicial AND @dataFinal AND 
+	usuarios.sexoId BETWEEN @categIni AND @categFim; 
 END
 GO
 ```
