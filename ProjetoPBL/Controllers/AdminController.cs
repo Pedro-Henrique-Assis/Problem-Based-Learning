@@ -83,38 +83,64 @@ namespace ProjetoPBL.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            // Proteção: Somente admins podem acessar
             if (!IsUserAdmin())
-                return RedirectToAction("Index", "Login");
+            {
+                // Para requisições AJAX, retornar um status de não autorizado
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return Json(new { sucesso = false, mensagem = "Acesso não autorizado." });
+                }
+                return RedirectToAction("Index", "Home");
+            }
+
+            string mensagemSucesso = null;
+            string mensagemErro = null;
 
             try
             {
                 var usuarioLogadoId = Convert.ToInt32(HttpContext.Session.GetString("IdUsuario"));
                 if (id == usuarioLogadoId)
                 {
-                    TempData["ErroExcluir"] = "Você não pode excluir sua própria conta.";
+                    mensagemErro = "Você não pode excluir sua própria conta.";
                 }
                 else
                 {
-                    // Verificar se é o último admin antes de excluir
                     var usuarioParaExcluir = _usuarioDAO.Consulta(id);
-                    var todosAdmins = _usuarioDAO.Listagem().Where(u => u.IsAdmin).ToList();
-
-                    if (usuarioParaExcluir.IsAdmin && todosAdmins.Count <= 1)
+                    if (usuarioParaExcluir == null) // Adiciona verificação se usuário existe
                     {
-                        TempData["ErroExcluir"] = "Não é possível excluir o último administrador do sistema.";
+                        mensagemErro = "Usuário não encontrado para exclusão.";
                     }
                     else
                     {
-                        _usuarioDAO.Delete(id);
-                        TempData["SucessoExcluir"] = "Usuário excluído com sucesso.";
+                        var todosAdmins = _usuarioDAO.Listagem().Where(u => u.IsAdmin).ToList();
+                        if (usuarioParaExcluir.IsAdmin && todosAdmins.Count <= 1)
+                        {
+                            mensagemErro = "Não é possível excluir o último administrador do sistema.";
+                        }
+                        else
+                        {
+                            _usuarioDAO.Delete(id);
+                            mensagemSucesso = "Usuário excluído com sucesso.";
+                        }
                     }
                 }
             }
             catch (Exception erro)
             {
-                return View("Error", new ErrorViewModel(erro.ToString()));
+                mensagemErro = "Ocorreu um erro ao tentar excluir o usuário.";
             }
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                if (!string.IsNullOrEmpty(mensagemErro))
+                {
+                    return Json(new { sucesso = false, mensagem = mensagemErro });
+                }
+                return Json(new { sucesso = true, mensagem = mensagemSucesso });
+            }
+
+            if (!string.IsNullOrEmpty(mensagemErro)) TempData["ErroExcluir"] = mensagemErro;
+            if (!string.IsNullOrEmpty(mensagemSucesso)) TempData["SucessoExcluir"] = mensagemSucesso;
 
             return RedirectToAction("ConsultaAvancada");
         }
