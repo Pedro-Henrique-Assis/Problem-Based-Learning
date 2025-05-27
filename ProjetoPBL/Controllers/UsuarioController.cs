@@ -116,7 +116,7 @@ namespace ProjetoPBL.Controllers
             if (usuario.DataNascimento > DateTime.Now)
                 ModelState.AddModelError("DataNascimento", "Data inválida!");
             if (!Validador.ValidaCep(usuario.Cep))
-                ModelState.AddModelError("Cep", "O formato do cep está incorreto. Modelo: xxxxx-xxx");
+                ModelState.AddModelError("Cep", "O formato do cep está incorreto. Modelo: xxxxx-xxx ou xxxxxxxx");
             if (string.IsNullOrEmpty(usuario.Logradouro))
                 ModelState.AddModelError("Logradouro", "Preencha o logradouro.");
             if (usuario.Numero <= 0)

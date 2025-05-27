@@ -14,7 +14,7 @@ namespace ProjetoPBL.DAO
         //Modelo padrão de cep:
         //'xxxxx-xxx'
         private static readonly Regex CepRegex = new Regex(
-        @"^\d{5}-\d{3}$",
+        @"^\d{5}-?\d{3}$",
         RegexOptions.Compiled);
 
         /// <summary>
