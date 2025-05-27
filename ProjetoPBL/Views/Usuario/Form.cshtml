@@ -82,9 +82,15 @@
             <span asp-validation-for="Senha"></span>
             <br />
 
-            <input type="file" name="Imagem" id="Imagem" onchange="exibirImagem()">
-            <img id="imgPreview" src="data:image/jpeg;base64,@Model.ImagemEmBase64" width="100">
-            <span asp-validation-for="Imagem"></span>
+            <div class="image-upload-wrapper">
+                <label for="Imagem" class="botao-upload">
+                    <i class="fas fa-upload"></i> Escolha sua foto de perfil
+                    @* Ícone opcional, requer Font Awesome ou similar *@
+                </label>
+                <input type="file" name="Imagem" id="Imagem" onchange="exibirImagem()">
+                <img id="imgPreview" src="data:image/jpeg;base64,@Model.ImagemEmBase64" width="100">
+                <span asp-validation-for="Imagem"></span>
+            </div>
 
             <br />
             <input type="submit" value="Finalizar cadastro" />
@@ -96,11 +102,37 @@
 
 
 <script>
-    function exibirImagem() {
-        var oFReader = new FileReader();
-        oFReader.readAsDataURL(document.getElementById("Imagem").files[0]);
-        oFReader.onload = function (oFREvent) {
-            document.getElementById("imgPreview").src = oFREvent.target.result;
-        };
+        function exibirImagem() {
+        var input = document.getElementById("Imagem");
+        var preview = document.getElementById("imgPreview");
+        var fileNameSpan = document.getElementById("nome-arquivo"); // Pega o span do nome
+
+        // Verifica se há arquivos selecionados
+        if (input.files && input.files[0]) {
+            var oFReader = new FileReader();
+            oFReader.readAsDataURL(input.files[0]);
+
+            oFReader.onload = function (oFREvent) {
+                preview.src = oFREvent.target.result;
+                preview.style.display = 'inline-block'; // Mostra a imagem
+            };
+
+            fileNameSpan.textContent = input.files[0].name; // Mostra o nome do arquivo
+        } else {
+            fileNameSpan.textContent = "Nenhum arquivo selecionado"; // Texto padrão
+            preview.src = ""; // Limpa o src
+            preview.style.display = 'none'; // Esconde a imagem
+        }
     }
+
+    // Para garantir que a imagem apareça (ou não) ao carregar a página (no caso de edição)
+    document.addEventListener("DOMContentLoaded", function() {
+        var preview = document.getElementById("imgPreview");
+        // Verifica se o src tem algo além do prefixo 'data:image' ou se não está vazio
+        if (preview.src && !preview.src.endsWith("base64,") && preview.src.includes("data:image")) {
+            preview.style.display = 'inline-block';
+        } else {
+            preview.style.display = 'none';
+        }
+    });
 </script>
