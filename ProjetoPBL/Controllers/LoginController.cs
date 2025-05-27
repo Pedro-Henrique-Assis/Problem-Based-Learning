@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProjetoPBL.DAO;
+using ProjetoPBL.Models;
 
 namespace ProjetoPBL.Controllers
 {
@@ -14,19 +15,15 @@ namespace ProjetoPBL.Controllers
 
         public IActionResult FazLogin(string usuario, string senha)
         {
-            bool existe = false;
             var usuarioDAO = new UsuarioDAO();
-            var lista = usuarioDAO.Listagem();
+            UsuarioViewModel u = usuarioDAO.Consulta(usuario, senha);
 
-            foreach(var usuarioCadastrado in lista)
-            {
-                if (usuarioCadastrado.LoginUsuario == usuario && usuarioCadastrado.Senha == senha)
-                    existe = true;
-            }
-
-            if (existe)
+            if (u != null)
             {
                 HttpContext.Session.SetString("Logado", "true");
+                HttpContext.Session.SetString("IdUsuario", u.Id.ToString()); // Guarda o ID do usuário.
+                HttpContext.Session.SetString("NomeUsuario", u.Nome);
+                HttpContext.Session.SetString("IsAdmin", u.IsAdmin.ToString());
                 return RedirectToAction("index", "Home");
             }
             else

@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Gerenciamento de Usuários";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/consultaAvancada.css"" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+}
+
+<fieldset id="areaFiltro" class="form-group">
+    <legend>@ViewData["Title"]</legend>
+    <div class="row">
+        <div class="col-lg-4">
+            Nome do usuário<br />
+            <input type="text" id="nome" class="form-control" />
+        </div>
+        <div class="col-lg-4">
+            Estado<br />
+            <input type="text" id="estado" class="form-control" />
+        </div>
+        <div class="col-lg-3">
+            Sexo <br />
+            <select id="sexoId" class="form-control" asp-items="@ViewBag.Sexos"></select>
+        </div>
+        <div class="col-lg-2">
+            Data de nascimento <br />
+            <input type="date" id="dataInicial" class="form-control" />
+        </div>
+        <div class="col-lg-2">
+            <br />
+            <input type="date" id="dataFinal" class="form-control" />
+        </div>
+        <div class="col-lg-1">
+            <br />
+            <input type="button" id="btnFiltro" class="btn btn-success" value="Aplicar"
+                   onclick="aplicaFiltroConsultaAvancada()" />
+        </div>
+    </div>
+</fieldset>
+<div id="resultadoConsulta" class="table-responsive">
+</div>

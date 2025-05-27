@@ -31,7 +31,7 @@ namespace ProjetoPBL.DAO
         }
 
         /// <summary>
-        /// Valida se o CEP informado está no formato '12345-678'.
+        /// Valida se o CEP informado está no formato '12345-678' ou '12345678'.
         /// </summary>
         /// <param name="cep">Cep que será verificado</param>
         /// <returns>True se for válido; caso contrário, false.</returns>

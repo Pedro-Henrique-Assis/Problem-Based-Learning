@@ -48,6 +48,11 @@ namespace ProjetoPBL.Models
         /// Indica se o usuário solicitou a remoção da imagem de perfil atual.
         /// </summary>
         public bool RemoverImagemAtual { get; set; } = false;
+
+        /// <summary>
+        /// Indica se o usuário é um administrador.
+        /// </summary>
+        public bool IsAdmin { get; set; } = false;
     }
 }
 

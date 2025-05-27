@@ -73,7 +73,6 @@ namespace ProjetoPBL.Controllers
             }
             catch (Exception ex)
             {
-                // Logar o erro (ex)
                 ViewBag.Erro = "Ocorreu um erro ao tentar atualizar a senha.";
                 return View("TrocaSenha", model);
             }

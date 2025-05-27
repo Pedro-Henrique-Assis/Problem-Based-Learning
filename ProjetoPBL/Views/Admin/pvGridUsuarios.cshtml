@@ -1,0 +1,21 @@
+﻿@model List<UsuarioViewModel>
+<table class="table table-striped">
+    <tr>
+        <th>Código</th>
+        <th>Nome</th>
+        <th>Data de nascimento</th>
+        <th>Sexo</th>
+        <th>Estado</th>
+    </tr>
+    @foreach (var usuario in Model)
+    {
+        <tr>
+            <td>@usuario.Id</td>
+            <td>@usuario.Nome</td>
+            <td>@usuario.DataNascimento.ToShortDateString()</td>
+            <td>@usuario.SexoId - @usuario.NomeSexo</td>
+            <td>@usuario.Estado</td>
+        </tr>
+    }
+</table>
+

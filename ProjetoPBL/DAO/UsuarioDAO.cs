@@ -1,30 +1,41 @@
 ﻿using ProjetoPBL.Models;
-using System.Data;
 using System;
-using System.Data.SqlClient;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Reflection;
 
 namespace ProjetoPBL.DAO
 {
     public class UsuarioDAO : PadraoDAO<UsuarioViewModel>
     {
+        protected override void SetTabela()
+        {
+            Tabela = "usuarios";
+            NomeSpListagem = "spListagem";
+        }
+
+        /// <summary>
+        /// Cria os parâmetros SQL para Insert e Update, incluindo IsAdmin.
+        /// </summary>
         protected override SqlParameter[] CriaParametros(UsuarioViewModel usuario)
         {
 			List<SqlParameter> parametros = new List<SqlParameter>
 			{
-				new SqlParameter("id", usuario.Id),
-				new SqlParameter("nome", usuario.Nome),
-				new SqlParameter("email", usuario.Email),
-				new SqlParameter("data_nascimento", usuario.DataNascimento),
-				new SqlParameter("cep", usuario.Cep),
-				new SqlParameter("logradouro", usuario.Logradouro),
-				new SqlParameter("numero", usuario.Numero),
-				new SqlParameter("cidade", usuario.Cidade),
-				new SqlParameter("estado", usuario.Estado),
-				new SqlParameter("loginUsuario", usuario.LoginUsuario),
-				new SqlParameter("senha", usuario.Senha),
-				new SqlParameter("sexoId", usuario.SexoId),
-			};
+				new SqlParameter("@id", usuario.Id),
+				new SqlParameter("@nome", usuario.Nome),
+				new SqlParameter("@email", usuario.Email),
+				new SqlParameter("@data_nascimento", usuario.DataNascimento),
+				new SqlParameter("@cep", usuario.Cep),
+				new SqlParameter("@logradouro", usuario.Logradouro),
+				new SqlParameter("@numero", usuario.Numero),
+				new SqlParameter("@cidade", usuario.Cidade),
+				new SqlParameter("@estado", usuario.Estado),
+				new SqlParameter("@loginUsuario", usuario.LoginUsuario),
+				new SqlParameter("@senha", usuario.Senha),
+				new SqlParameter("@sexoId", usuario.SexoId),
+                new SqlParameter("@IsAdmin", usuario.IsAdmin),
+            };
 
             if (usuario.ImagemEmByte != null)
                 parametros.Add(new SqlParameter("imagem", usuario.ImagemEmByte));
@@ -32,6 +43,9 @@ namespace ProjetoPBL.DAO
             return parametros.ToArray();
         }
 
+        /// <summary>
+        /// Mapeia um DataRow para o UsuarioViewModel, incluindo IsAdmin.
+        /// </summary>
         protected override UsuarioViewModel MontaModel(DataRow registro)
         {
             UsuarioViewModel usuario = new UsuarioViewModel();
@@ -47,6 +61,7 @@ namespace ProjetoPBL.DAO
             usuario.LoginUsuario = registro["loginUsuario"].ToString();
             usuario.Senha = registro["senha"].ToString();
             usuario.SexoId = Convert.ToInt32(registro["sexoid"]);
+			usuario.IsAdmin = Convert.ToBoolean(registro["IsAdmin"]);
 
             if (registro["imagem"] != DBNull.Value)
                 usuario.ImagemEmByte = registro["imagem"] as byte[];
@@ -57,10 +72,62 @@ namespace ProjetoPBL.DAO
             return usuario;
         }
 
-        protected override void SetTabela()
+        /// <summary>
+        /// Sobrescreve Listagem para incluir IsAdmin no SELECT.
+        /// </summary>
+        public override List<UsuarioViewModel> Listagem()
         {
-            Tabela = "usuarios";
-            NomeSpListagem = "spListagem";
+            var tabela = HelperDAO.ExecutaSelect($"select u.*, s.nome as NomeSexo from {Tabela} u left join sexos s on u.sexoId = s.id", null);
+            List<UsuarioViewModel> lista = new List<UsuarioViewModel>();
+            foreach (DataRow registro in tabela.Rows)
+                lista.Add(MontaModel(registro));
+            return lista;
+        }
+
+        /// <summary>
+        /// Sobrescreve Consulta para incluir IsAdmin no SELECT.
+        /// </summary>
+        public override UsuarioViewModel Consulta(int id)
+        {
+            var p = new SqlParameter[] { new SqlParameter("id", id) };
+            var tabela = HelperDAO.ExecutaSelect($"select u.*, s.nome as NomeSexo from {Tabela} u left join sexos s on u.sexoId = s.id where u.id = @id", p);
+            if (tabela.Rows.Count == 0)
+                return null;
+            else
+                return MontaModel(tabela.Rows[0]);
+        }
+
+        /// <summary>
+        /// Sobrescreve Consulta(login, senha) para incluir IsAdmin no SELECT.
+        /// </summary>
+        public UsuarioViewModel Consulta(string login, string senha)
+        {
+            var p = new SqlParameter[]
+            {
+                new SqlParameter("@login", login),
+                new SqlParameter("@senha", senha)
+            };
+            var tabela = HelperDAO.ExecutaSelect($"select u.*, s.nome as NomeSexo from {Tabela} u left join sexos s on u.sexoId = s.id where u.loginUsuario = @login and u.senha = @senha", p);
+            if (tabela.Rows.Count == 0)
+                return null;
+            else
+                return MontaModel(tabela.Rows[0]);
+        }
+
+        public List<UsuarioViewModel> ConsultaAvancadaUsuarios(string nome, string estado, int sexoId, DateTime dataInicial, DateTime dataFinal)
+        {
+            SqlParameter[] p = {
+                new SqlParameter("@nome", nome),
+                new SqlParameter("@estado", estado),
+                new SqlParameter("@sexoId", sexoId),
+                new SqlParameter("@dataInicial", dataInicial),
+                new SqlParameter("@dataFinal", dataFinal),
+            };
+            var tabela = HelperDAO.ExecutaProcSelect("spConsultaAvancadaUsuarios", p);
+            var lista = new List<UsuarioViewModel>();
+            foreach (DataRow dr in tabela.Rows)
+                lista.Add(MontaModel(dr));
+            return lista;
         }
     }
 }
@@ -90,7 +157,7 @@ as
 begin 
 	declare @sql varchar(max); 
 	set @sql = 'select * from ' + @tabela + 
-	' where id = ' + cast(@id as varchar(max)) 
+	'  where id = ' + cast(@id as varchar(max)) 
 	exec(@sql)
 end
 go
@@ -130,14 +197,15 @@ create procedure spInsert_usuarios
 	@loginUsuario varchar(max),
 	@senha varchar(max),
 	@sexoId int,
-	@imagem varbinary(max)
+	@imagem varbinary(max),
+    @IsAdmin bit
 )
 as
 begin
 	insert into usuarios
-		(id, nome, email, data_nascimento, cep, logradouro, numero, cidade, estado, loginUsuario, senha, sexoId, imagem)
+		(id, nome, email, data_nascimento, cep, logradouro, numero, cidade, estado, loginUsuario, senha, sexoId, imagem, IsAdmin)
 	values
-		(@id, @nome, @email, @data_nascimento, @cep, @logradouro, @numero, @cidade, @estado, @loginUsuario, @senha, @sexoId, @imagem)
+		(@id, @nome, @email, @data_nascimento, @cep, @logradouro, @numero, @cidade, @estado, @loginUsuario, @senha, @sexoId, @imagem, @IsAdmin)
 end
 go
 
@@ -156,7 +224,8 @@ create procedure spUpdate_usuarios
 	@loginUsuario varchar(max),
 	@senha varchar(max),
 	@sexoId int,
-	@imagem varbinary(max)
+	@imagem varbinary(max),
+    @IsAdmin bit
 )
 as
 begin
@@ -172,8 +241,32 @@ begin
 		   loginUsuario = @loginUsuario,
 		   senha = @senha,
 		   sexoId = @sexoId,
-		   imagem = @imagem
+		   imagem = @imagem,
+           IsAdmin = @IsAdmin
 	where id = @id
+end
+go
+
+create procedure [dbo].[spConsultaAvancadaUsuarios] 
+( 
+	@nome varchar(max), 
+	@estado varchar(max),
+	@sexoId int,
+	@dataInicial datetime, 
+	@dataFinal datetime) 
+as 
+begin 
+	declare @categIni int 
+	declare @categFim int 
+	set @categIni = case @sexoId when 0 then 0 else @sexoId end
+	set @categFim = case @sexoId when 0 then 999999 else @sexoId end 
+	select usuarios.*, sexos.nome as 'NomeSexo' 
+	from usuarios 
+	inner join sexos on usuarios.sexoId = sexos.Id 
+	where usuarios.nome like '%' + @nome + '%' and
+	usuarios.estado like '%' + @estado + '%' and
+	usuarios.data_nascimento between @dataInicial and @dataFinal and 
+	usuarios.sexoId between @categIni and @categFim; 
 end
 go
 */
