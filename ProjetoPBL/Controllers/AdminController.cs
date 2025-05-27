@@ -26,7 +26,7 @@ namespace ProjetoPBL.Controllers
         /// </summary>
         private bool IsUserAdmin()
         {
-            return HttpContext.Session.GetString("Logado") == "True" &&
+            return HttpContext.Session.GetString("Logado") == "true" &&
                    HttpContext.Session.GetString("IsAdmin") == "True";
         }
 
@@ -59,7 +59,7 @@ namespace ProjetoPBL.Controllers
             {
                 // Proteção: Somente admins podem acessar
                 if (!IsUserAdmin())
-                    return RedirectToAction("Index", "Login");
+                    return RedirectToAction("Index", "Home");
 
                 ViewBag.Logado = HelperControllers.VerificaUserLogado(HttpContext.Session);
                 PreparaListaSexosParaFiltro();

@@ -5,8 +5,8 @@
     var vDataInicial = document.getElementById('dataInicial').value;
     var vDataFinal = document.getElementById('dataFinal').value;
     $.ajax({
-        url: "/jogo/ObtemDadosConsultaAvancada",
-        data: { Nome: vNome, Estado: vEstado, sexoId: vSexo, dataInicial: vDataInicial, dataFinal: vDataFinal },
+        url: "/Admin/ObtemDadosConsultaAvancada",
+        data: { nome: vNome, estado: vEstado, sexoId: vSexo, dataInicial: vDataInicial, dataFinal: vDataFinal },
         success: function (dados) {
             if (dados.erro != undefined) {
                 alert(dados.msg);
