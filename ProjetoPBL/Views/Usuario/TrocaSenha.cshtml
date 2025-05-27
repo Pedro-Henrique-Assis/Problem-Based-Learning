@@ -1,0 +1,77 @@
+﻿@model ProjetoPBL.Models.TrocaSenhaViewModel
+@{
+    ViewData["Title"] = "Trocar Senha";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/trocaSenha.css" asp-append-version="true" />
+}
+
+@* Adicione a classe ao body se você a definiu no CSS, caso contrário, remova esta linha e o estilo no CSS *@
+<body class="troca-senha-body">
+
+    <div class="wrapper-troca-senha">
+        @* Classe wrapper específica *@
+        <div class="title">
+            <span>Trocar Senha</span>
+        </div>
+        <form asp-action="SalvarNovaSenha" method="post">
+            @Html.AntiForgeryToken()
+
+            @if (ViewBag.Erro != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ViewBag.Erro
+                </div>
+            }
+            @if (TempData["MensagemErro"] != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @TempData["MensagemErro"]
+                </div>
+            }
+            @if (TempData["MensagemSucesso"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    @TempData["MensagemSucesso"]
+                </div>
+            }
+
+            <div asp-validation-summary="ModelOnly" class="text-danger" style="text-align:center; margin-bottom:10px;"></div>
+
+            <div class="field">
+                <input asp-for="LoginUsuario" required />
+                <label asp-for="LoginUsuario">Usuário</label>
+                <span asp-validation-for="LoginUsuario" class="text-danger"></span>
+            </div>
+
+            <div class="field">
+                <input asp-for="NovaSenha" type="password" required />
+                <label asp-for="NovaSenha">Nova Senha</label>
+                <span asp-validation-for="NovaSenha" class="text-danger"></span>
+            </div>
+
+            <div class="field">
+                <input asp-for="ConfirmacaoNovaSenha" type="password" required />
+                <label asp-for="ConfirmacaoNovaSenha">Confirme a Nova Senha</label>
+                <span asp-validation-for="ConfirmacaoNovaSenha" class="text-danger"></span>
+            </div>
+
+            <div class="field">
+                <input type="submit" value="Salvar" />
+            </div>
+
+            <div class="signup-link">
+                Lembrou a senha? <a asp-controller="Login" asp-action="Index">Fazer Login</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

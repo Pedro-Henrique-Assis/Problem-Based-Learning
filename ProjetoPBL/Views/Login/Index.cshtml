@@ -1,7 +1,11 @@
-﻿<head>
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+<head>
     <meta charset="utf-8" />
     <title>Magitech</title>
-    <link rel="stylesheet" href="/css/login.css" />
+    <link rel="stylesheet" href="/css/login.css" asp-append-version="true" />
 </head>
 
 <body>
@@ -9,6 +13,12 @@
         <div class="title">Bem-vindo!</div>
 
         <form action="/login/Fazlogin" method="post">
+            @if (ViewBag.Erro != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ViewBag.Erro
+                </div>
+            }
             <div class="field">
                 <input type="text" name="usuario" required />
                 <label>Usuário</label>
@@ -24,9 +34,17 @@
             </div>
 
             <div class="signup-link">
-                Não possui conta? <a href="/usuario/Create">Registre-se agora</a>
+                Esqueceu sua senha? <a asp-controller="Usuario" asp-action="TrocaSenha">Trocar senha</a>
             </div>
+
+            <div class="signup-link">
+                Não possui conta? <a asp-controller="Usuario" asp-action="Create">Registre-se agora</a>
+            </div>
+
         </form>
     </div>
 </body>
-</html>
+
+@section Scripts {
+    <script src="~/js/login.js" asp-append-version="true"></script>
+}

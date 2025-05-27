@@ -1,0 +1,154 @@
+﻿/* Importa a fonte Poppins, se ainda não estiver globalmente importada */
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+/* Estilos base para a página de troca de senha, podem ser herdados do login.css ou redefinidos aqui */
+html, body.troca-senha-body { /* Adicionando uma classe específica ao body para evitar conflitos globais */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Garante que ocupe toda a altura da tela */
+    background: #f2f2f2;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+::selection {
+    background: #4158d0;
+    color: #fff;
+}
+
+.wrapper-troca-senha { /* Usando uma classe wrapper específica para evitar conflitos */
+    width: 550px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0px 15px 20px rgba(0,0,0,0.3);
+}
+
+    .wrapper-troca-senha .title {
+        font-size: 30px; /* Ajustado para "Trocar Senha" */
+        font-weight: 600;
+        text-align: center;
+        line-height: 80px; /* Ajustado para o novo título */
+        color: #fff;
+        user-select: none;
+        border-radius: 15px 15px 0 0;
+        background: linear-gradient(-135deg, #c850c0, #4158d0);
+    }
+
+    .wrapper-troca-senha form {
+        padding: 10px 30px 30px 30px; /* Padding interno do formulário */
+    }
+
+        .wrapper-troca-senha form .field {
+            height: 50px;
+            width: 100%;
+            margin-top: 20px; /* Espaço entre os campos */
+            margin-bottom: 25px; /* Aumenta espaço para validação */
+            position: relative;
+        }
+
+            .wrapper-troca-senha form .field input {
+                height: 100%;
+                width: 100%;
+                outline: none;
+                font-size: 17px;
+                padding-left: 20px;
+                border: 1px solid lightgrey;
+                border-radius: 25px;
+                transition: all 0.3s ease;
+            }
+
+                .wrapper-troca-senha form .field input:focus,
+                .wrapper-troca-senha form .field input:valid {
+                    border-color: #4158d0;
+                }
+
+            .wrapper-troca-senha form .field label {
+                position: absolute;
+                top: 50%;
+                left: 20px;
+                color: #999999;
+                font-weight: 400;
+                font-size: 17px;
+                pointer-events: none;
+                transform: translateY(-50%);
+                transition: all 0.3s ease;
+            }
+
+            .wrapper-troca-senha form .field input:focus ~ label,
+            .wrapper-troca-senha form .field input:valid ~ label {
+                top: 0%;
+                font-size: 16px;
+                color: #4158d0;
+                background: #fff;
+                transform: translateY(-50%);
+            }
+
+            /* Estilo para o span de validação */
+            .wrapper-troca-senha form .field .text-danger {
+                display: block;
+                position: absolute; /* Permite posicionamento fino */
+                bottom: -20px; /* Posiciona abaixo do campo, ajuste conforme necessário */
+                left: 15px; /* Alinhamento à esquerda do campo */
+                width: calc(100% - 30px); /* Largura do campo menos os paddings */
+                font-size: 0.8em;
+                color: #dc3545;
+                /* white-space: nowrap; */ /* Evita quebra de linha se a mensagem for curta */
+            }
+
+
+            .wrapper-troca-senha form .field input[type="submit"] {
+                color: #fff;
+                border: none;
+                padding-left: 0;
+                margin-top: 10px; /* Ajustado o margin-top para o botão de submit */
+                font-size: 20px;
+                font-weight: 500;
+                cursor: pointer;
+                background: linear-gradient(-135deg, #c850c0, #4158d0);
+                transition: all 0.3s ease;
+                height: 50px; /* Altura explícita para consistência */
+                width: 100%; /* Largura total */
+                border-radius: 25px; /* Borda arredondada como os inputs */
+            }
+
+                .wrapper-troca-senha form .field input[type="submit"]:active {
+                    transform: scale(0.95);
+                }
+
+        .wrapper-troca-senha form .signup-link {
+            color: #262626;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+            .wrapper-troca-senha form .signup-link a {
+                color: #4158d0;
+                text-decoration: none;
+            }
+
+                .wrapper-troca-senha form .signup-link a:hover {
+                    text-decoration: underline;
+                }
+
+    /* Estilos para os alertas, caso ainda não estejam globalmente definidos ou precisem de ajuste */
+    .wrapper-troca-senha .alert {
+        padding: .75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: .25rem;
+        font-size: 0.9em;
+    }
+
+    .wrapper-troca-senha .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    .wrapper-troca-senha .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }

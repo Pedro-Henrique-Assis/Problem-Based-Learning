@@ -6,6 +6,7 @@ using ProjetoPBL.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace ProjetoPBL.Controllers
@@ -17,6 +18,65 @@ namespace ProjetoPBL.Controllers
             DAO = new UsuarioDAO();
             GeraProximoId = true;
             ExigeAutenticacao = false;
+        }
+
+        [HttpGet]
+        public IActionResult TrocaSenha()
+        {
+            // A troca de senha não exige autenticação para ser acessada
+            ViewBag.Logado = HelperControllers.VerificaUserLogado(HttpContext.Session);
+            return View(new TrocaSenhaViewModel());
+        }
+
+        // POST: Usuario/SalvarNovaSenha
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SalvarNovaSenha(TrocaSenhaViewModel model)
+        {
+            ViewBag.Logado = HelperControllers.VerificaUserLogado(HttpContext.Session);
+
+            if (!ModelState.IsValid)
+            {
+                return View("TrocaSenha", model);
+            }
+
+            var usuarioDAO = (UsuarioDAO)DAO; // Cast para ter acesso aos métodos específicos se necessário
+            var listaUsuarios = usuarioDAO.Listagem();
+            UsuarioViewModel usuarioParaAtualizar = listaUsuarios.FirstOrDefault(u => u.LoginUsuario == model.LoginUsuario);
+
+            if (usuarioParaAtualizar == null)
+            {
+                ModelState.AddModelError("LoginUsuario", "Usuário não encontrado.");
+                return View("TrocaSenha", model);
+            }
+
+            if (usuarioParaAtualizar.Senha == model.NovaSenha)
+            {
+                ModelState.AddModelError("NovaSenha", "A nova senha não pode ser igual à senha antiga.");
+                return View("TrocaSenha", model);
+            }
+
+            // Atualiza apenas a senha do usuário
+            usuarioParaAtualizar.Senha = model.NovaSenha;
+
+            try
+            {
+                // Como o método Update do PadraoDAO espera o modelo completo,
+                // e a stored procedure spUpdate_usuarios atualiza todos os campos,
+                // precisamos garantir que os outros campos não sejam alterados indevidamente.
+                // O DAO.Update já recebe o usuarioParaAtualizar que contém todos os dados
+                // originais, exceto a senha que acabamos de modificar.
+                DAO.Update(usuarioParaAtualizar);
+
+                TempData["MensagemSucesso"] = "Senha alterada com sucesso! Você já pode fazer login com a nova senha.";
+                return RedirectToAction("Index", "Login");
+            }
+            catch (Exception ex)
+            {
+                // Logar o erro (ex)
+                ViewBag.Erro = "Ocorreu um erro ao tentar atualizar a senha.";
+                return View("TrocaSenha", model);
+            }
         }
 
         /// <summary>

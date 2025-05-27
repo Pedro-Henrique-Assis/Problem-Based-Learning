@@ -8,10 +8,11 @@
 }
 
 html, body {
-    display: flex; 
+    display: flex;
     justify-content: center;
     align-items: center;
     background: #f2f2f2;
+    min-height: 100vh; /* Garante que ocupe toda a altura da tela */
 }
 
 ::selection {
@@ -20,7 +21,7 @@ html, body {
 }
 
 .wrapper {
-    width: 380px;
+    width: 550px;
     background: #fff;
     border-radius: 15px;
     box-shadow: 0px 15px 20px rgba(0,0,0,0.1);
