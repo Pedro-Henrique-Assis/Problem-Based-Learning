@@ -131,7 +131,7 @@ namespace ProjetoPBL.DAO
                 {
                     new
                     {
-                        device_id = $"tempsensor{sensor}",
+                        device_id = sensor, // usa o nome exato do sensor
                         entity_name = $"urn:ngsi-ld:TemperatureSensor:{sensor}",
                         entity_type = "TemperatureSensor",
                         protocol = "PDI-IoTA-UltraLight",
@@ -219,6 +219,33 @@ namespace ProjetoPBL.DAO
             content.Headers.Add("fiware-servicepath", "/");
 
             await client.PostAsync(url, content);
+        }
+
+        /// <summary>
+        /// Exclui o sensor do FIWARE Orion Context Broker e IoT Agent
+        /// </summary>
+        /// <param name="host">Host do FIWARE</param>
+        /// <param name="sensor">Identificador do sensor</param>
+        /// <returns>Task assíncrona</returns>
+        public static async Task ExcluirSensor(string host, string sensor)
+        {
+            using var client = new HttpClient();
+
+            // URL para excluir dispositivo no IoT Agent
+            var urlIoTAgent = $"http://{host}:4041/iot/devices/{sensor}";
+            var requestIoTAgent = new HttpRequestMessage(HttpMethod.Delete, urlIoTAgent);
+            requestIoTAgent.Headers.Add("fiware-service", "smart");
+            requestIoTAgent.Headers.Add("fiware-servicepath", "/");
+            var responseIoTAgent = await client.SendAsync(requestIoTAgent);
+            responseIoTAgent.EnsureSuccessStatusCode();
+
+            // URL para excluir entidade no Orion Context Broker
+            var urlOrion = $"http://{host}:1026/v2/entities/urn:ngsi-ld:TemperatureSensor:{sensor}";
+            var requestOrion = new HttpRequestMessage(HttpMethod.Delete, urlOrion);
+            requestOrion.Headers.Add("fiware-service", "smart");
+            requestOrion.Headers.Add("fiware-servicepath", "/");
+            var responseOrion = await client.SendAsync(requestOrion);
+            responseOrion.EnsureSuccessStatusCode();
         }
     }
 }
