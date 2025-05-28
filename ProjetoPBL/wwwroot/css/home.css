@@ -1,6 +1,6 @@
 ﻿/* Estilos básicos para a barra de navegação no header da Home */
 header .navbar-custom {
-    background-color: #f8f9fa; /* Um cinza claro, pode ajustar */
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
     padding: 10px 20px;
     border-bottom: 1px solid #e0e0e0;
     margin-bottom: 20px; /* Espaço abaixo do header */
@@ -12,6 +12,7 @@ header .navbar-custom {
         padding: 0;
         display: flex; /* Alinha os itens do menu horizontalmente */
         align-items: center; /* Centraliza verticalmente os itens */
+        justify-content: center;
     }
 
         header .navbar-custom ul li {
@@ -19,24 +20,24 @@ header .navbar-custom {
             position: relative; /* Necessário para o posicionamento absoluto do dropdown-content */
         }
 
-            header .navbar-custom ul li a {
+            header .navbar-custom ul > li > a {
                 text-decoration: none;
-                color: #333; /* Cor padrão dos links */
+                color: #fff; /* Cor padrão dos links */
                 padding: 8px 12px; /* Padding para melhor área de clique/hover */
                 display: block; /* Faz o link ocupar o espaço do padding */
                 border-radius: 4px; /* Bordas levemente arredondadas para o hover */
                 transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
             }
 
-                header .navbar-custom ul li a:hover,
+                header .navbar-custom ul > li > a:hover,
                 header .navbar-custom ul li .dropbtn:hover {
-                    color: #0056b3; /* Azul mais escuro no hover */
-                    background-color: #e9ecef; /* Um leve fundo ao passar o mouse */
+                    color: #fff; /* Azul mais escuro no hover */
+                    background-color: rgba(255, 255, 255, 0.2);
                 }
 
 /* Estilos para o Dropdown */
 header .dropdown .dropbtn {
-    cursor: default; /* Mantém o cursor padrão, já que a ação é no hover */
+    cursor: pointer; /* Mantém o cursor padrão, já que a ação é no hover */
     display: flex; /* Para alinhar o texto e o ícone */
     align-items: center;
 }
@@ -59,7 +60,7 @@ header .dropdown-content {
 }
 
     header .dropdown-content a {
-        color: #333;
+        color: #000 !important;
         padding: 10px 15px;
         text-decoration: none;
         display: block;
@@ -67,8 +68,8 @@ header .dropdown-content {
     }
 
         header .dropdown-content a:hover {
-            background-color: #007bff; /* Cor de destaque do Bootstrap */
-            color: #fff; /* Texto branco no hover */
+            background-color: #f0f0f0; /* Cor de destaque do Bootstrap */
+            color: #000; /* Texto preto no hover */
         }
 
 /* Mostra o dropdown ao passar o mouse sobre o item li.dropdown */

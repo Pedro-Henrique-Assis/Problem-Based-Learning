@@ -1,4 +1,5 @@
 ﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Página Inicial";
 }
 
@@ -7,23 +8,46 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 }
 
-<header>
-    <nav class="navbar-custom">
-        <ul>
-            <li>
-                <a asp-controller="Sensor" asp-action="Index">
-                    🔧 Gerenciar Sensores
-                </a>
-            </li>
-            <li class="dropdown">
-                <a href="javascript:void(0)" class="dropbtn">
-                    📊 Consultas Avançadas <i class="fas fa-caret-down"></i>
-                </a>
-                <div class="dropdown-content">
-                    <a asp-controller="Admin" asp-action="ConsultaAvancada">👤 Usuários</a>
-                    <a asp-controller="ConsultaSensor" asp-action="Index">🌡️ Sensores</a>
-                </div>
-            </li>
-        </ul>
-    </nav>
-</header>
+<body>
+    @section Header{
+        <header>
+            <nav class="navbar-custom">
+                <ul>
+                    <li>
+                        <a asp-controller="Home" asp-action="Index">
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <a asp-controller="Sensor" asp-action="Index">
+                            🔧 Gerenciar Sensores
+                        </a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="javascript:void(0)" class="dropbtn">
+                            📊 Consultas Avançadas <i class="fas fa-caret-down"></i>
+                        </a>
+                        <div class="dropdown-content">
+                            <a asp-controller="Admin" asp-action="ConsultaAvancada">👤 Usuários</a>
+                            <a asp-controller="ConsultaSensor" asp-action="Index">🌡️ Sensores</a>
+                        </div>
+                    </li>
+                    <li class="dropdown">
+                        <a href="javascript:void(0)" class="dropbtn">
+                            📊 Dashboards <i class="fas fa-caret-down"></i>
+                        </a>
+                        <div class="dropdown-content">
+                            <a asp-controller="Home" asp-action="Index">📈 Dashboard1</a>
+                            <a asp-controller="Home" asp-action="Index">📈 Dashboard2</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a asp-controller="Home" asp-action="Index">
+                            👤 Sobre
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+    }
+</body>
