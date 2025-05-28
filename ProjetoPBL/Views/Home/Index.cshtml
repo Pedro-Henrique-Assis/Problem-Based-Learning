@@ -2,19 +2,28 @@
     ViewData["Title"] = "Página Inicial";
 }
 
-<div class="container mt-5">
-    <h2 class="mb-4">Bem-vindo ao Sistema!</h2>
-    <p>Escolha uma das opções abaixo:</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+}
 
-    <div class="list-group">
-        <a asp-controller="Sensor" asp-action="Index" class="list-group-item list-group-item-action">
-            🔧 Gerenciar Sensores
-        </a>
-        <a asp-controller="Usuario" asp-action="Index" class="list-group-item list-group-item-action">
-            👤 Gerenciar Usuários
-        </a>
-        <a asp-controller="Admin" asp-action="ConsultaAvancada" class="list-group-item list-group-item-action">
-            👤 Consulta Avançada Admins
-        </a>
-    </div>
-</div>
+<header>
+    <nav class="navbar-custom">
+        <ul>
+            <li>
+                <a asp-controller="Sensor" asp-action="Index">
+                    🔧 Gerenciar Sensores
+                </a>
+            </li>
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">
+                    📊 Consultas Avançadas <i class="fas fa-caret-down"></i>
+                </a>
+                <div class="dropdown-content">
+                    <a asp-controller="Admin" asp-action="ConsultaAvancada">👤 Usuários</a>
+                    <a asp-controller="#" asp-action="#">🌡️ Sensores</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+</header>

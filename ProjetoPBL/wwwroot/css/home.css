@@ -1,0 +1,77 @@
+﻿/* Estilos básicos para a barra de navegação no header da Home */
+header .navbar-custom {
+    background-color: #f8f9fa; /* Um cinza claro, pode ajustar */
+    padding: 10px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 20px; /* Espaço abaixo do header */
+}
+
+    header .navbar-custom ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        display: flex; /* Alinha os itens do menu horizontalmente */
+        align-items: center; /* Centraliza verticalmente os itens */
+    }
+
+        header .navbar-custom ul li {
+            margin-right: 25px; /* Espaçamento entre os itens do menu */
+            position: relative; /* Necessário para o posicionamento absoluto do dropdown-content */
+        }
+
+            header .navbar-custom ul li a {
+                text-decoration: none;
+                color: #333; /* Cor padrão dos links */
+                padding: 8px 12px; /* Padding para melhor área de clique/hover */
+                display: block; /* Faz o link ocupar o espaço do padding */
+                border-radius: 4px; /* Bordas levemente arredondadas para o hover */
+                transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
+            }
+
+                header .navbar-custom ul li a:hover,
+                header .navbar-custom ul li .dropbtn:hover {
+                    color: #0056b3; /* Azul mais escuro no hover */
+                    background-color: #e9ecef; /* Um leve fundo ao passar o mouse */
+                }
+
+/* Estilos para o Dropdown */
+header .dropdown .dropbtn {
+    cursor: default; /* Mantém o cursor padrão, já que a ação é no hover */
+    display: flex; /* Para alinhar o texto e o ícone */
+    align-items: center;
+}
+
+    header .dropdown .dropbtn .fa-caret-down {
+        margin-left: 8px; /* Espaço entre o texto e o ícone da seta */
+    }
+
+header .dropdown-content {
+    display: none; /* Escondido por padrão */
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 220px; /* Largura mínima do dropdown */
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1000; /* Garante que fique por cima de outros elementos */
+    border-radius: 4px;
+    margin-top: 2px; /* Pequeno espaço entre o botão e o conteúdo do dropdown */
+    padding: 5px 0; /* Padding interno vertical */
+    border: 1px solid #ddd;
+}
+
+    header .dropdown-content a {
+        color: #333;
+        padding: 10px 15px;
+        text-decoration: none;
+        display: block;
+        white-space: nowrap; /* Impede que o texto quebre em várias linhas */
+    }
+
+        header .dropdown-content a:hover {
+            background-color: #007bff; /* Cor de destaque do Bootstrap */
+            color: #fff; /* Texto branco no hover */
+        }
+
+/* Mostra o dropdown ao passar o mouse sobre o item li.dropdown */
+header .dropdown:hover .dropdown-content {
+    display: block;
+}
