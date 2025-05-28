@@ -1,61 +1,103 @@
-﻿/* Estilos básicos para a barra de navegação no header da Home */
+﻿@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%; /* Garante que html e body ocupem 100% da altura */
+    overflow: hidden; /* Remove scrollbars de html e body */
+}
+
+/* Estilos básicos para a barra de navegação no header da Home */
 header .navbar-custom {
     background: linear-gradient(-135deg, #c850c0, #4158d0);
     padding: 10px 20px;
-    border-bottom: 1px solid #e0e0e0;
-    margin-bottom: 20px; /* Espaço abaixo do header */
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+
 }
+
+    /* Estilo para o Logo */
+    header .navbar-custom .logo {
+        margin: 0;
+    }
+
+        header .navbar-custom .logo a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.9em;
+        }
 
     header .navbar-custom ul {
         list-style-type: none;
-        margin: 0;
+        margin: 0 auto;
         padding: 0;
         display: flex; /* Alinha os itens do menu horizontalmente */
         align-items: center; /* Centraliza verticalmente os itens */
         justify-content: center;
+        flex-grow: 1;
     }
 
         header .navbar-custom ul li {
-            margin-right: 25px; /* Espaçamento entre os itens do menu */
-            position: relative; /* Necessário para o posicionamento absoluto do dropdown-content */
+            margin-right: 25px;
+            position: relative;
         }
 
-            header .navbar-custom ul > li > a {
-                text-decoration: none;
-                color: #fff; /* Cor padrão dos links */
-                padding: 8px 12px; /* Padding para melhor área de clique/hover */
-                display: block; /* Faz o link ocupar o espaço do padding */
-                border-radius: 4px; /* Bordas levemente arredondadas para o hover */
-                transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave */
+        header .navbar-custom ul > li > a {
+            text-decoration: none;
+            color: #fff;
+            padding: 8px 12px;
+            display: block;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+            header .navbar-custom ul > li > a:hover,
+            header .navbar-custom ul li .dropbtn:hover {
+                color: #fff;
+                background-color: rgba(255, 255, 255, 0.2);
             }
 
-                header .navbar-custom ul > li > a:hover,
-                header .navbar-custom ul li .dropbtn:hover {
-                    color: #fff; /* Azul mais escuro no hover */
-                    background-color: rgba(255, 255, 255, 0.2);
-                }
+    header .navbar-custom .chamado {
+        border: 1px solid #fff;
+        border-radius: 0.375rem;
+        color: #fff;
+        padding: 5px 5px
+    }
 
-/* Estilos para o Dropdown */
-header .dropdown .dropbtn {
-    cursor: pointer; /* Mantém o cursor padrão, já que a ação é no hover */
-    display: flex; /* Para alinhar o texto e o ícone */
+        header .navbar-custom .chamado:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+        }
+
+
+    /* Estilos para o Dropdown */
+    header .dropdown .dropbtn {
+    cursor: pointer;
+    display: flex;
     align-items: center;
 }
 
     header .dropdown .dropbtn .fa-caret-down {
-        margin-left: 8px; /* Espaço entre o texto e o ícone da seta */
+        margin-left: 8px;
     }
 
 header .dropdown-content {
-    display: none; /* Escondido por padrão */
+    display: none;
     position: absolute;
     background-color: #f9f9f9;
-    min-width: 220px; /* Largura mínima do dropdown */
+    min-width: 220px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1000; /* Garante que fique por cima de outros elementos */
     border-radius: 4px;
     margin-top: 2px; /* Pequeno espaço entre o botão e o conteúdo do dropdown */
-    padding: 5px 0; /* Padding interno vertical */
+    padding: 5px 0;
     border: 1px solid #ddd;
 }
 
@@ -68,11 +110,101 @@ header .dropdown-content {
     }
 
         header .dropdown-content a:hover {
-            background-color: #f0f0f0; /* Cor de destaque do Bootstrap */
-            color: #000; /* Texto preto no hover */
+            background-color: #f0f0f0;
+            color: #000;
         }
 
 /* Mostra o dropdown ao passar o mouse sobre o item li.dropdown */
 header .dropdown:hover .dropdown-content {
     display: block;
+}
+
+.hero-section {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-grow: 1;
+    padding: 0 15px;
+    max-width: 100%;
+    margin: 0 auto;
+    background-image: url('../img/tablet-791051_1920.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+}
+
+    .hero-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 0;
+    }
+
+    .hero-section .hero,
+    .hero-section .img {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .hero-section .hero {
+        max-width: 50%;
+        color: #fff;
+        text-align: center;
+    }
+
+.hero h2 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    color: #fff;
+    align-items: center;
+}
+
+.hero p {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+
+.hero-section .buttons {
+    margin-top: 40px;
+}
+
+    .hero-section .buttons a {
+        text-decoration: none;
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 0.375rem;
+        font-weight: 600;
+        transition: 0.2s ease;
+        display: inline-block;
+    }
+
+        .hero-section .buttons a:not(:last-child) {
+            margin-right: 15px;
+        }
+
+.buttons .about {
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
+}
+
+.hero-section .buttons .logoff {
+    border: 1px solid #fff;
+    border-radius: 0.375rem;
+    color: #fff;
+}
+
+.hero-section .buttons a:hover {
+    opacity: 0.8;
 }

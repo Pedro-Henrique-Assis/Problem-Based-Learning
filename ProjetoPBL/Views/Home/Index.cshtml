@@ -12,6 +12,7 @@
     @section Header{
         <header>
             <nav class="navbar-custom">
+                <h2 class="logo"><a asp-controller="Home" asp-action="Index">MAGITECH</a></h2>
                 <ul>
                     <li>
                         <a asp-controller="Home" asp-action="Index">
@@ -47,7 +48,23 @@
                         </a>
                     </li>
                 </ul>
+                <a asp-controller="Home" asp-action="Index" class="chamado">Abrir chamado</a>
             </nav>
         </header>
+    }
+    @section MainContentFullWidth {
+        <section class="hero-section">
+            <div class="hero">
+                <h2>SEJA BEM VINDO</h2>
+                <p>
+                    A Magitech oferece as melhores soluções de sensores e ainda
+                    possui dashboards e consultas avançadas interativas!
+                </p>
+                <div class="buttons">
+                    <a href="#" class="about">Sobre nós</a>
+                    <a asp-controller="Login" asp-action="LogOff" class="logoff">Log off</a>
+                </div>
+            </div>
+        </section>
     }
 </body>
