@@ -1,0 +1,25 @@
+﻿@model List<ProjetoPBL.Models.SensorViewModel>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Local</th>
+            <th>Valor</th>
+            <th>Data de Instalação</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.nomeSensor</td>
+                <td>@item.descricaoSensor</td>
+                <td>@item.localInstalacao</td>
+                <td>@item.valorInstalacao.ToString("C")</td>
+                <td>@item.dataInstalacao.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>

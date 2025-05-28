@@ -3,6 +3,7 @@ using System.Data;
 using System;
 using System.Data.SqlClient;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ProjetoPBL.DAO
 {
@@ -74,60 +75,30 @@ namespace ProjetoPBL.DAO
             DataTable dt = HelperDAO.ExecutaProcSelect("sp_verificar_sensor", sp);
             return Convert.ToInt32(dt.Rows[0]["cont"]);
         }
+
+        public List<SensorViewModel> ConsultaAvancada(string local, decimal? valorMin, decimal? valorMax, DateTime? dataInicial, DateTime? dataFinal)
+        {
+            var lista = Listagem(); // ou um SELECT com WHERE
+
+            if (!string.IsNullOrEmpty(local))
+                lista = lista.Where(s => s.localInstalacao.Contains(local)).ToList();
+
+            if (valorMin.HasValue)
+                lista = lista.Where(s => s.valorInstalacao >= valorMin).ToList();
+
+            if (valorMax.HasValue)
+                lista = lista.Where(s => s.valorInstalacao <= valorMax).ToList();
+
+            if (dataInicial.HasValue)
+                lista = lista.Where(s => s.dataInstalacao >= dataInicial).ToList();
+
+            if (dataFinal.HasValue)
+                lista = lista.Where(s => s.dataInstalacao <= dataFinal).ToList();
+
+            return lista;
+        }
+
     }
 }
 
-
-//--Script de criação da tabela sensor
-//CREATE TABLE sensor (
-//    id INT IDENTITY(1,1) PRIMARY KEY,
-//    nomeSensor VARCHAR(100) NOT NULL,
-//    descricaoSensor VARCHAR(255),
-//    localInstalacao VARCHAR(100),
-//    valorInstalacao DECIMAL(10, 2),
-//    dataInstalacao DATETIME
-//);
-
-//--Verifica se já existe um sensor com o mesmo nome
-//CREATE PROCEDURE sp_verificar_sensor
-//    @nomeSensor VARCHAR(100)
-//AS
-//BEGIN
-//    SELECT COUNT(*) AS cont
-//    FROM sensor
-//    WHERE nomeSensor = @nomeSensor;
-//END
-
-//-- Insere um novo sensor
-//CREATE PROCEDURE sp_inserir_sensor
-//    @nomeSensor VARCHAR(100),
-//    @descricaoSensor VARCHAR(255),
-//    @localInstalacao VARCHAR(100),
-//    @valorInstalacao DECIMAL(10,2),
-//    @dataInstalacao DATETIME
-//AS
-//BEGIN
-//    INSERT INTO sensor (nomeSensor, descricaoSensor, localInstalacao, valorInstalacao, dataInstalacao)
-//    VALUES (@nomeSensor, @descricaoSensor, @localInstalacao, @valorInstalacao, @dataInstalacao);
-//END
-
-//-- Atualiza um sensor existente
-//CREATE PROCEDURE sp_alterar_sensor
-//    @id INT,
-//    @nomeSensor VARCHAR(100),
-//    @descricaoSensor VARCHAR(255),
-//    @localInstalacao VARCHAR(100),
-//    @valorInstalacao DECIMAL(10,2),
-//    @dataInstalacao DATETIME
-//AS
-//BEGIN
-//    UPDATE sensor
-//    SET
-//        nomeSensor = @nomeSensor,
-//        descricaoSensor = @descricaoSensor,
-//        localInstalacao = @localInstalacao,
-//        valorInstalacao = @valorInstalacao,
-//        dataInstalacao = @dataInstalacao
-//    WHERE id = @id;
-//END
 
