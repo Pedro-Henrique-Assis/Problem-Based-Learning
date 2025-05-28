@@ -236,6 +236,29 @@ BEGIN
 END
 GO
 
+--Consulta avançada de Sensor 
+
+CREATE PROCEDURE spConsultaAvancadaSensores
+    @local VARCHAR(100) = NULL,
+    @valorMin DECIMAL(10,2) = NULL,
+    @valorMax DECIMAL(10,2) = NULL,
+    @dataInicial DATETIME = NULL,
+    @dataFinal DATETIME = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT *
+    FROM sensor
+    WHERE (@local IS NULL OR localInstalacao LIKE '%' + @local + '%')
+      AND (@valorMin IS NULL OR valorInstalacao >= @valorMin)
+      AND (@valorMax IS NULL OR valorInstalacao <= @valorMax)
+      AND (@dataInicial IS NULL OR dataInstalacao >= @dataInicial)
+      AND (@dataFinal IS NULL OR dataInstalacao <= @dataFinal)
+END
+GO
+
+
 ```
 
 
