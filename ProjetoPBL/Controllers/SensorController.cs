@@ -6,8 +6,15 @@ using System.Threading.Tasks;
 
 namespace ProjetoPBL.Controllers
 {
+    /// <summary>
+    /// Controller responsável pelo gerenciamento dos sensores,
+    /// incluindo operações CRUD e integração com o FIWARE.
+    /// </summary>
     public class SensorController : PadraoController<SensorViewModel>
     {
+        /// <summary>
+        /// Construtor do controller que inicializa o DAO específico e configura geração automática de ID.
+        /// </summary>
         public SensorController()
         {
             DAO = new SensorDAO();
@@ -15,8 +22,11 @@ namespace ProjetoPBL.Controllers
         }
 
         /// <summary>
-        /// Valida os dados do sensor no FIWARE antes de inserir
+        /// Valida dados e realiza integração com FIWARE antes de inserir um sensor.
+        /// Verifica se o servidor FIWARE está disponível e cria o sensor via API.
         /// </summary>
+        /// <param name="model">Objeto sensor a ser validado</param>
+        /// <param name="operacao">Tipo de operação: "I" para inserir</param>
         private async Task ValidarDadosFiware(SensorViewModel model, string operacao)
         {
             if (!await HelperFiwareDAO.VerificarServer(HelperFiwareDAO.host))
@@ -32,8 +42,11 @@ namespace ProjetoPBL.Controllers
         }
 
         /// <summary>
-        /// Valida os dados do formulário antes de inserir/editar
+        /// Valida os dados do formulário antes de inserir ou editar.
+        /// Inclui validações específicas para sensor e chama validação externa FIWARE.
         /// </summary>
+        /// <param name="model">Objeto sensor</param>
+        /// <param name="operacao">Operação atual ("I" ou "A")</param>
         protected override void ValidaDados(SensorViewModel model, string operacao)
         {
             base.ValidaDados(model, operacao);
@@ -63,20 +76,27 @@ namespace ProjetoPBL.Controllers
         }
 
         /// <summary>
-        /// Sobrescreve Save para adicionar mensagens com TempData
+        /// Sobrescreve o método Save para inserir ou atualizar sensor,
+        /// adicionando mensagens de sucesso via TempData.
         /// </summary>
+        /// <param name="model">Objeto sensor</param>
+        /// <param name="operacao">Operação ("I" para inserir, "A" para atualizar)</param>
+        /// <returns>Redirect ou View em caso de erro</returns>
         [HttpPost]
         public override IActionResult Save(SensorViewModel model, string operacao)
         {
             try
             {
+                // Gera ID automaticamente se necessário na inserção
                 if (operacao == "I" && model.Id == 0 && GeraProximoId)
                 {
-                    PreencheDadosParaView(operacao, model); // Garante que o ID seja gerado se não veio do GET
+                    PreencheDadosParaView(operacao, model);
                 }
 
+                // Valida dados do sensor
                 ValidaDados(model, operacao);
 
+                // Se houver erro de validação, retorna para o formulário
                 if (!ModelState.IsValid)
                 {
                     ViewBag.Operacao = operacao;
@@ -84,6 +104,7 @@ namespace ProjetoPBL.Controllers
                     return View("Form", model);
                 }
 
+                // Executa inserção ou atualização no banco
                 if (operacao == "I")
                 {
                     DAO.Insert(model);
@@ -95,6 +116,7 @@ namespace ProjetoPBL.Controllers
                     TempData["Mensagem"] = "Sensor atualizado com sucesso!";
                 }
 
+                // Redireciona após salvar
                 return GetSaveRedirectAction(operacao);
             }
             catch (Exception erro)
@@ -103,11 +125,49 @@ namespace ProjetoPBL.Controllers
             }
         }
 
+        /// <summary>
+        /// Preenche dados padrão para as views,
+        /// por exemplo definindo data de instalação na inserção.
+        /// </summary>
+        /// <param name="Operacao">Operação atual ("I" ou "A")</param>
+        /// <param name="model">Objeto sensor</param>
         protected override void PreencheDadosParaView(string Operacao, SensorViewModel model)
         {
             base.PreencheDadosParaView(Operacao, model);
+
             if (Operacao == "I")
                 model.dataInstalacao = DateTime.Now;
+        }
+
+        /// <summary>
+        /// Sobrescreve o método Delete para também excluir o sensor no FIWARE
+        /// antes de apagar localmente.
+        /// </summary>
+        /// <param name="id">ID do sensor a ser excluído</param>
+        /// <returns>Redirect para lista ou view de erro</returns>
+        public override IActionResult Delete(int id)
+        {
+            try
+            {
+                // Consulta sensor para obter dados
+                var sensor = DAO.Consulta(id);
+                if (sensor == null)
+                    return RedirectToAction("Index");
+
+                // Exclui sensor no FIWARE (chamada síncrona)
+                HelperFiwareDAO.ExcluirSensor(HelperFiwareDAO.host, sensor.nomeSensor).GetAwaiter().GetResult();
+
+                // Exclui sensor localmente no banco de dados
+                DAO.Delete(id);
+
+                TempData["Mensagem"] = "Sensor excluído com sucesso, incluindo o FIWARE.";
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception erro)
+            {
+                return View("Error", new ErrorViewModel(erro.ToString()));
+            }
         }
     }
 }

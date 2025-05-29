@@ -231,21 +231,24 @@ namespace ProjetoPBL.DAO
         {
             using var client = new HttpClient();
 
-            // URL para excluir dispositivo no IoT Agent
+            // Excluir dispositivo no IoT Agent
             var urlIoTAgent = $"http://{host}:4041/iot/devices/{sensor}";
             var requestIoTAgent = new HttpRequestMessage(HttpMethod.Delete, urlIoTAgent);
             requestIoTAgent.Headers.Add("fiware-service", "smart");
             requestIoTAgent.Headers.Add("fiware-servicepath", "/");
             var responseIoTAgent = await client.SendAsync(requestIoTAgent);
-            responseIoTAgent.EnsureSuccessStatusCode();
+            if (responseIoTAgent.StatusCode != System.Net.HttpStatusCode.NotFound)
+                responseIoTAgent.EnsureSuccessStatusCode();
 
-            // URL para excluir entidade no Orion Context Broker
+            // Excluir entidade no Orion Context Broker
             var urlOrion = $"http://{host}:1026/v2/entities/urn:ngsi-ld:TemperatureSensor:{sensor}";
             var requestOrion = new HttpRequestMessage(HttpMethod.Delete, urlOrion);
             requestOrion.Headers.Add("fiware-service", "smart");
             requestOrion.Headers.Add("fiware-servicepath", "/");
             var responseOrion = await client.SendAsync(requestOrion);
-            responseOrion.EnsureSuccessStatusCode();
+            if (responseOrion.StatusCode != System.Net.HttpStatusCode.NotFound)
+                responseOrion.EnsureSuccessStatusCode();
         }
+
     }
 }

@@ -119,7 +119,7 @@ namespace ProjetoPBL.Controllers
             }
         }
 
-        public IActionResult Delete(int id)
+        public virtual IActionResult Delete(int id)
         {
             try
             {

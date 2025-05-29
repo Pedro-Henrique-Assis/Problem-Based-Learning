@@ -1,10 +1,11 @@
-﻿@model SensorViewModel
+﻿@model ProjetoPBL.Models.SensorViewModel
+
 @{
     ViewData["Title"] = ViewBag.Operacao == "I" ? "Cadastro de Sensores" : "Edição de Sensores";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/cadastroSensores.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/cadastroSensores.css" asp-append-version="true" />
 }
 
 <div class="container-externo-forms">
@@ -17,7 +18,15 @@
 
             <div>
                 <label>Nome do Sensor</label>
-                <input asp-for="nomeSensor" required />
+                @if (ViewBag.Operacao == "I")
+                {
+                        <input asp-for="nomeSensor" required />
+                }
+                else
+                {
+                        <p>@Model.nomeSensor</p>
+                        <input type="hidden" asp-for="nomeSensor" />
+                }
                 <span asp-validation-for="nomeSensor" class="text-danger"></span>
             </div>
 
@@ -45,7 +54,7 @@
                 <span asp-validation-for="dataInstalacao" class="text-danger"></span>
             </div>
 
-            <input type="submit" value="Cadastrar" />
+            <input type="submit" value="@(ViewBag.Operacao == "I" ? "Cadastrar" : "Atualizar")" />
 
             <a asp-action="Index" asp-controller="Sensor" class="btn btn-secondary">Voltar para Lista</a>
         </div>
