@@ -24,7 +24,7 @@ namespace ProjetoPBL.Controllers
                 HttpContext.Session.SetString("IdUsuario", u.Id.ToString()); // Guarda o ID do usuário.
                 HttpContext.Session.SetString("NomeUsuario", u.Nome);
                 HttpContext.Session.SetString("IsAdmin", u.IsAdmin.ToString());
-                return RedirectToAction("index", "Home");
+                return RedirectToAction("Index", "Home");
             }
             else
             {
