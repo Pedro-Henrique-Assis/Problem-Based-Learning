@@ -1,0 +1,111 @@
+﻿@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Estilos básicos para a barra de navegação no header da Home */
+header .navbar-custom {
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
+    padding: 10px 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+    /* Estilo para o Logo */
+    header .navbar-custom .logo {
+        margin: 0;
+    }
+
+        header .navbar-custom .logo a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.9em;
+        }
+
+    header .navbar-custom ul {
+        list-style-type: none;
+        margin: 0 auto;
+        padding: 0;
+        display: flex; /* Alinha os itens do menu horizontalmente */
+        align-items: center; /* Centraliza verticalmente os itens */
+        justify-content: center;
+        flex-grow: 1;
+    }
+
+        header .navbar-custom ul li {
+            margin-right: 25px;
+            position: relative;
+        }
+
+        header .navbar-custom ul > li > a {
+            text-decoration: none;
+            color: #fff;
+            padding: 8px 12px;
+            display: block;
+            border-radius: 4px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+            header .navbar-custom ul > li > a:hover,
+            header .navbar-custom ul li .dropbtn:hover {
+                color: #fff;
+                background-color: rgba(255, 255, 255, 0.2);
+            }
+
+    header .navbar-custom .chamado {
+        border: 1px solid #fff;
+        border-radius: 0.375rem;
+        color: #fff;
+        padding: 5px 5px
+    }
+
+        header .navbar-custom .chamado:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+        }
+
+
+/* Estilos para o Dropdown */
+header .dropdown .dropbtn {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+    header .dropdown .dropbtn .fa-caret-down {
+        margin-left: 8px;
+    }
+
+header .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 220px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1000; /* Garante que fique por cima de outros elementos */
+    border-radius: 4px;
+    margin-top: 2px; /* Pequeno espaço entre o botão e o conteúdo do dropdown */
+    padding: 5px 0;
+    border: 1px solid #ddd;
+}
+
+    header .dropdown-content a {
+        color: #000 !important;
+        padding: 10px 15px;
+        text-decoration: none;
+        display: block;
+        white-space: nowrap; /* Impede que o texto quebre em várias linhas */
+    }
+
+        header .dropdown-content a:hover {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+
+/* Mostra o dropdown ao passar o mouse sobre o item li.dropdown */
+header .dropdown:hover .dropdown-content {
+    display: block;
+}

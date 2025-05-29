@@ -1,5 +1,62 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Sobre nós";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/sobre.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+}
+
+@section MainContentFullWidth {
+    <div class="about-container">
+        <section class="about-section text-center">
+            <h1 class="company-title">MAGITECH</h1>
+            <p class="company-story">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </p>
+        </section>
+
+        <section class="team-section">
+            <h2 class="section-title">Nossa Equipe</h2>
+            <div class="team-members">
+                <div class="team-member">
+                    <img src="~/img/foto_pedro.jpg" alt="Foto do Colaborador 1" class="member-photo">
+                    <span class="member-name">Pedro Assis</span>
+                </div>
+                <div class="team-member">
+                    <img src="~/img/foto_ana.png" alt="Foto do Colaborador 2" class="member-photo">
+                    <span class="member-name">Ana Souza</span>
+                </div>
+                <div class="team-member">
+                    <img src="~/img/foto_alex.png" alt="Foto do Colaborador 3" class="member-photo">
+                    <span class="member-name">Alex Nishimura</span>
+                </div>
+                <div class="team-member">
+                    <img src="~/img/foto_caio.png" alt="Foto do Colaborador 4" class="member-photo">
+                    <span class="member-name">Caio Rossi</span>
+                </div>
+                <div class="team-member">
+                    <img src="~/img/foto_duda.png" alt="Foto do Colaborador 5" class="member-photo">
+                    <span class="member-name">Maria Eduarda</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <h2 class="section-title">Features da Magitech</h2>
+            <div class="features-list-container">
+                <ul class="features-list">
+                    <li>Monitoramento em Tempo Real</li>
+                    <li>Dashboards Intuitivos e Customizáveis</li>
+                    <li>Alertas e Notificações Inteligentes</li>
+                    <li>Relatórios Detalhados e Históricos</li>
+                    <li>Integração Fácil com Sensores IoT</li>
+                    <li>Segurança de Dados de Ponta a Ponta</li>
+                    <li>Suporte Técnico Especializado 24/7</li>
+                    <li>APIs para Integração com Outros Sistemas</li>
+                </ul>
+            </div>
+        </section>
+    </div>
 }
