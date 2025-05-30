@@ -1,0 +1,22 @@
+﻿h2 {
+    color: #4bc0c0;
+    font-weight: bold;
+    margin-bottom: 25px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+#chartTemperaturas {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fafafa;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    height: auto !important;
+}
+
+.container-dashboard {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
