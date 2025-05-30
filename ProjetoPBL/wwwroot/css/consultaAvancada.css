@@ -1,8 +1,15 @@
-﻿html, body {
+﻿@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100%; /* Garante que html e body ocupem 100% da altura */
+    height: 100%;
+    overflow-x: hidden;
 }
 
 fieldset {
@@ -15,4 +22,37 @@ fieldset {
 
 legend {
     padding: 2px 4px;
+}
+
+.btnFiltro {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    background: linear-gradient(-135deg, #c850c0, #4158d0);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+    .btnFiltro:hover {
+        background: linear-gradient(-135deg, #b33cb0, #3148b0);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
+    .btnFiltro:active {
+        transform: scale(0.98);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+
+#resultadoConsulta {
+    margin-left: 20px;
+    margin-right: 20px;
 }

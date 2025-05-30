@@ -92,18 +92,20 @@ namespace ProjetoPBL.Controllers
                 // Redireciona para Login/Index especificamente na inserção de usuário
                 return RedirectToAction("Index", "Login");
             }
+            else if (operacao == "A")
+            {
+                TempData["MensagemSucessoAdmin"] = "Usuário atualizado com sucesso!";
+                return RedirectToAction("ConsultaAvancada", "Admin");
+            }
             else
             {
-                // Para outras operações (como Update), usa o comportamento padrão
                 return base.GetSaveRedirectAction(operacao);
             }
         }
 
         protected override void ValidaDados(UsuarioViewModel usuario, string operacao)
         {
-            bool usuarioJaExiste = false;
-            var usuarioDAO = new UsuarioDAO();
-            var lista = usuarioDAO.Listagem();
+            bool usuarioJaExiste = ((UsuarioDAO)DAO).Listagem().Any(u => u.LoginUsuario == usuario.LoginUsuario && u.Id != usuario.Id);
 
             //Mantém a validação de Id presente na PadraoController
             base.ValidaDados(usuario, operacao);
@@ -129,48 +131,47 @@ namespace ProjetoPBL.Controllers
             if (usuario.Imagem != null && usuario.Imagem.Length / 1024 / 1024 >= 2.048)
                 ModelState.AddModelError("Imagem", "Imagem limitada a 2 mb.");
 
-            foreach (var usuarioCadastrado in lista)
-            {
-                if (usuarioCadastrado.LoginUsuario == usuario.LoginUsuario)
-                {
-                    usuarioJaExiste = true;
-                    break;
-                }
-                    
-            }
-
             if (usuarioJaExiste)
                 ModelState.AddModelError("LoginUsuario", "Usuário já cadastrado");
 
-            // Processamento da Imagem
-            if (ModelState.IsValid) // Processa imagem apenas se o restante do modelo for válido
+            // Na inserção, a senha é obrigatória
+            if (operacao == "I" && string.IsNullOrEmpty(usuario.Senha))
+                ModelState.AddModelError("Senha", "A senha é obrigatória.");
+
+            // Processamento da Imagem e Senha
+            if (ModelState.IsValid) // Processa apenas se o restante do modelo for válido
             {
+                // Se for uma alteração, precisamos buscar os dados atuais para manter
+                // a imagem e a senha, caso não sejam alteradas.
+                if (operacao == "A")
+                {
+                    // Evita consulta dupla ao banco se já tivermos os dados.
+                    UsuarioViewModel usuarioAtual = DAO.Consulta(usuario.Id);
+                    if (usuarioAtual != null)
+                    {
+                        // Lógica da Senha: Se o campo veio vazio, mantém a senha antiga.
+                        if (string.IsNullOrEmpty(usuario.Senha))
+                        {
+                            usuario.Senha = usuarioAtual.Senha;
+                        }
+
+                        // Lógica da Imagem: Se uma nova imagem não foi enviada E não foi solicitado para remover,
+                        // mantém a imagem antiga.
+                        if (usuario.Imagem == null && !usuario.RemoverImagemAtual)
+                        {
+                            usuario.ImagemEmByte = usuarioAtual.ImagemEmByte;
+                        }
+                    }
+                }
+
+                // Esta parte da sua lógica de imagem original continua válida
                 if (usuario.RemoverImagemAtual)
                 {
                     usuario.ImagemEmByte = null;
-                    usuario.Imagem = null; // Garante que o IFormFile também seja nulo
                 }
                 else if (usuario.Imagem != null) // Nova imagem foi enviada
                 {
                     usuario.ImagemEmByte = ConvertImageToByte(usuario.Imagem);
-                }
-                else if (operacao == "A") // É uma alteração e nenhuma nova imagem foi enviada E não é para remover
-                {
-                    // Mantém a imagem existente
-                    UsuarioViewModel u = DAO.Consulta(usuario.Id);
-                    if (u != null) // Verifica se o usuário consultado não é nulo
-                    {
-                        usuario.ImagemEmByte = u.ImagemEmByte;
-                    }
-                    else
-                    {
-                        // Se não encontrar o usuário (improvável aqui, mas por segurança)
-                        usuario.ImagemEmByte = null;
-                    }
-                }
-                else // É uma inserção e nenhuma imagem foi enviada
-                {
-                    usuario.ImagemEmByte = null;
                 }
             }
         }

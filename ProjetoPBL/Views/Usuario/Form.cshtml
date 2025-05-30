@@ -72,12 +72,30 @@
             <br />
 
             <label for="LoginUsuario">Insira seu usuario</label>
-            <input asp-for="LoginUsuario" />
+            @{
+                if(ViewBag.Operacao == "A")
+                {
+                    <input asp-for="LoginUsuario" readonly/>
+                }
+                else
+                {
+                    <input asp-for="LoginUsuario" />
+                }
+            }
             <span asp-validation-for="LoginUsuario"></span>
             <br />
 
             <label for="Senha">Insira sua senha</label>
-            <input asp-for="Senha" type="password" />
+            @{
+                if (ViewBag.Operacao == "A")
+                {
+                    <input asp-for="Senha" type="password" readonly/>
+                }
+                else
+                {
+                    <input asp-for="Senha" type="password" />
+                }
+            }
             <span asp-validation-for="Senha"></span>
             <br />
 
@@ -94,7 +112,17 @@
             </div>
 
             <br />
-            <input type="submit" value="Finalizar cadastro" />
+            @{
+                if (ViewBag.Operacao == "A")
+                {
+                    <input type="submit" value="Finalizar alterações" />
+                }
+                else
+                {
+                    <input type="submit" value="Finalizar cadastro" />
+
+                }
+            }
             <br />
         </div>
         
@@ -106,7 +134,7 @@
 @{
     await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
-<script>
+@* <script>
     function buscaCEP() {
         var cep = document.getElementById("cep").value;
         cep = cep.replace(/[^0-9]/g, ''); // Removemos tudo que não é dígito
@@ -202,5 +230,89 @@
         } else {
                 updateUI(false, false, null);
         }
+    });
+</script> *@
+
+
+<script>
+    // Função para buscar o CEP (mantida como está)
+    function buscaCEP() {
+        var cep = document.getElementById("cep").value;
+        cep = cep.replace(/[^0-9]/g, '');
+
+        if (cep.length === 8) {
+            var linkAPI = 'https://viacep.com.br/ws/' + cep + '/json/';
+            $.ajax({
+                url: linkAPI,
+                dataType: 'json',
+                beforeSend: function () {
+                    document.getElementById("logradouro").value = '...';
+                    document.getElementById("cidade").value = '...';
+                    document.getElementById("estado").value = '...';
+                },
+                success: function (dados) {
+                    if (dados.erro != undefined) {
+                        alert('CEP não localizado...');
+                        document.getElementById("logradouro").value = '';
+                        document.getElementById("cidade").value = '';
+                        document.getElementById("estado").value = '';
+                    } else {
+                        document.getElementById("logradouro").value = dados.logradouro;
+                        document.getElementById("cidade").value = dados.localidade;
+                        document.getElementById("estado").value = dados.uf;
+                        $("#numero").focus();
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert('Falha ao buscar CEP. Verifique o CEP ou a conexão.');
+                    console.error("Erro ViaCEP:", textStatus, errorThrown);
+                    $("#logradouro").val('');
+                    $("#cidade").val('');
+                    $("#estado").val('');
+                }
+            });
+        } else if (cep.length > 0) {
+            alert('CEP inválido. Deve conter 8 dígitos.');
+        } else {
+            alert('Por favor, digite um CEP.');
+        }
+    }
+
+    // Lógica corrigida para a pré-visualização da imagem
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputImagem = document.getElementById("Imagem");
+        const imgPreview = document.getElementById("imgPreview");
+        const removeImageBtn = document.getElementById("removeImageBtn");
+        const removerImagemAtualInput = document.getElementById("RemoverImagemAtual");
+        const hasExistingImage = '@Model.ImagemEmBase64'.length > 0;
+
+        if (hasExistingImage) {
+            imgPreview.style.display = 'inline-block';
+            removeImageBtn.style.display = 'inline-block';
+        } else {
+            imgPreview.style.display = 'none';
+            removeImageBtn.style.display = 'none';
+        }
+
+        inputImagem.addEventListener('change', function () {
+            if (inputImagem.files && inputImagem.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'inline-block';
+                    removeImageBtn.style.display = 'inline-block';
+                };
+                reader.readAsDataURL(inputImagem.files[0]);
+                removerImagemAtualInput.value = "false";
+            }
+        });
+
+        removeImageBtn.addEventListener('click', function () {
+            inputImagem.value = null;
+            imgPreview.src = '';
+            imgPreview.style.display = 'none';
+            removeImageBtn.style.display = 'none';
+            removerImagemAtualInput.value = "true";
+        });
     });
 </script>

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 }
 
-<body>
+@section MainContentFullWidth {
     <fieldset id="areaFiltro" class="form-group">
         <legend>@ViewData["Title"]</legend>
         <div class="row">
@@ -34,12 +34,13 @@
             </div>
             <div class="col-lg-1">
                 <br />
-                <input type="button" id="btnFiltro" class="btn btn-success" value="Aplicar"
-                       onclick="aplicaFiltroConsultaAvancada()" />
+                <input type="button" id="btnFiltro" class="btnFiltro" value="Aplicar"
+                        onclick="aplicaFiltroConsultaAvancada()" />
             </div>
         </div>
     </fieldset>
 
-</body>
-<div id="resultadoConsulta" class="table-responsive">
+    <div id="resultadoConsulta" class="table-responsive">
+}
+    
 </div>

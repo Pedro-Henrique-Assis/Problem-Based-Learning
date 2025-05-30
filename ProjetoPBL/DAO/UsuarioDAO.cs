@@ -37,9 +37,16 @@ namespace ProjetoPBL.DAO
                 new SqlParameter("@IsAdmin", usuario.IsAdmin),
             };
 
-            if (usuario.ImagemEmByte != null)
-                parametros.Add(new SqlParameter("imagem", usuario.ImagemEmByte));
+            SqlParameter imagemParam = new SqlParameter("@imagem", SqlDbType.VarBinary, -1);
 
+            if (usuario.ImagemEmByte != null && usuario.ImagemEmByte.Length > 0)
+                imagemParam.Value = usuario.ImagemEmByte;
+            //parametros.Add(new SqlParameter("@imagem", usuario.ImagemEmByte));
+            else
+                imagemParam.Value = DBNull.Value;
+            //parametros.Add(new SqlParameter("@imagem", DBNull.Value));
+
+            parametros.Add(imagemParam);
             return parametros.ToArray();
         }
 

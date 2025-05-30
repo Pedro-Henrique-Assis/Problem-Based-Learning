@@ -1,7 +1,6 @@
 ﻿@model List<UsuarioViewModel>
 <table class="table table-striped" id="tabelaUsuarios">
     <tr>
-        <th>Código</th>
         <th>Nome</th>
         <th>Email</th>
         <th>Data de nascimento</th>
@@ -16,17 +15,19 @@
     @foreach (var usuario in Model)
     {
         <tr id="usuario-row-@usuario.Id">
-            <td>@usuario.Id</td>
             <td>@usuario.Nome</td>
             <td>@usuario.Email</td>
             <td>@usuario.DataNascimento.ToShortDateString()</td>
-            <td>@usuario.SexoId - @usuario.NomeSexo</td>
+            <td>@usuario.NomeSexo</td>
             <td>@usuario.Cep</td>
             <td>@usuario.Logradouro</td>
             <td>@usuario.Numero</td>
             <td>@usuario.Cidade</td>
             <td>@usuario.Estado</td>
             <td>
+                <a href="/Usuario/Edit/?id=@usuario.Id" class="btn btn-light btn-sm">
+                    Editar
+                </a>
                 <button type="button" class="btn btn-danger btn-sm" onclick="confirmarExclusaoUsuario(@usuario.Id, '@usuario.Nome')">
                     Excluir
                 </button>
