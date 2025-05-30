@@ -266,6 +266,7 @@ BEGIN
       AND (@dataFinal IS NULL OR dataInstalacao <= @dataFinal)
 END
 GO
+```
 
 ### 🌡️ `temperatura`
 
