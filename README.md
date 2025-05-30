@@ -76,6 +76,7 @@ CREATE TABLE Temperaturas (
     RecvTime DATETIME2 NOT NULL,     
     Temperature FLOAT NOT NULL        
 );
+```
 ---
 
 ## 3. Stored Procedures Genéricas
