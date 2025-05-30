@@ -1,8 +1,4 @@
-﻿// HelperFiwareDAO.cs
-// Classe responsável pela integração do sistema com o FIWARE
-// Realiza operações como verificação de servidor, leitura de sensores, provisionamento de dispositivos e subscrição de dados
-
-using ProjetoPBL.Models;
+﻿using ProjetoPBL.Models;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -231,8 +227,15 @@ namespace ProjetoPBL.DAO
         {
             using var client = new HttpClient();
 
-            // Excluir dispositivo no IoT Agent
-            var urlIoTAgent = $"http://{host}:4041/iot/devices/{sensor}";
+            // Substitua espaços por underscore no nome do sensor para o Orion
+            string sensorOrionName = sensor.Replace(" ", "_");
+
+            // Codifica apenas o nome do sensor (caso tenha outros caracteres especiais)
+            string sensorEncoded = Uri.EscapeDataString(sensor);
+            string sensorOrionEncoded = Uri.EscapeDataString(sensorOrionName);
+
+            // Excluir dispositivo no IoT Agent (usa nome original, com espaços)
+            var urlIoTAgent = $"http://{host}:4041/iot/devices/{sensorEncoded}";
             var requestIoTAgent = new HttpRequestMessage(HttpMethod.Delete, urlIoTAgent);
             requestIoTAgent.Headers.Add("fiware-service", "smart");
             requestIoTAgent.Headers.Add("fiware-servicepath", "/");
@@ -240,8 +243,8 @@ namespace ProjetoPBL.DAO
             if (responseIoTAgent.StatusCode != System.Net.HttpStatusCode.NotFound)
                 responseIoTAgent.EnsureSuccessStatusCode();
 
-            // Excluir entidade no Orion Context Broker
-            var urlOrion = $"http://{host}:1026/v2/entities/urn:ngsi-ld:TemperatureSensor:{sensor}";
+            // Excluir entidade no Orion Context Broker (usa nome com underscore)
+            var urlOrion = $"http://{host}:1026/v2/entities/urn:ngsi-ld:TemperatureSensor:{sensorOrionEncoded}";
             var requestOrion = new HttpRequestMessage(HttpMethod.Delete, urlOrion);
             requestOrion.Headers.Add("fiware-service", "smart");
             requestOrion.Headers.Add("fiware-servicepath", "/");
@@ -249,6 +252,8 @@ namespace ProjetoPBL.DAO
             if (responseOrion.StatusCode != System.Net.HttpStatusCode.NotFound)
                 responseOrion.EnsureSuccessStatusCode();
         }
+
+
 
     }
 }

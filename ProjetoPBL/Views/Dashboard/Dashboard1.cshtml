@@ -1,8 +1,124 @@
 ﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Dashboard1";
+    ViewData["Title"] = "Dashboard de Temperaturas";
 }
 
 @section Styles {
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="~/css/dashboard1.css" />
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<canvas id="chartTemperaturas" width="800" height="400"></canvas>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const ctx = document.getElementById('chartTemperaturas').getContext('2d');
+        let chart;
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/Temperatura/Listar');
+                const data = await response.json();
+
+                const labels = data.map(d => new Date(d.recvTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                const temperatures = data.map(d => d.temperature);
+
+                if (chart) {
+                    chart.data.labels = labels;
+                    chart.data.datasets[0].data = temperatures;
+                    chart.update();
+                } else {
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Temperatura (°C)',
+                                data: temperatures,
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.3)',
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 0,
+                                pointHoverRadius: 6,
+                                borderWidth: 3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            interaction: {
+                                mode: 'nearest',
+                                intersect: false
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        font: {
+                                            size: 14,
+                                            weight: 'bold'
+                                        },
+                                        color: '#333'
+                                    }
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    backgroundColor: 'rgba(0,0,0,0.7)',
+                                    titleFont: { size: 16, weight: 'bold' },
+                                    bodyFont: { size: 14 }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    display: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Hora',
+                                        font: {
+                                            size: 14,
+                                            weight: 'bold'
+                                        },
+                                        color: '#666'
+                                    },
+                                    grid: { display: false },
+                                    ticks: {
+                                        maxRotation: 45,
+                                        minRotation: 45,
+                                        maxTicksLimit: 12
+                                    }
+                                },
+                                y: {
+                                    display: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Temperatura (°C)',
+                                        font: {
+                                            size: 14,
+                                            weight: 'bold'
+                                        },
+                                        color: '#666'
+                                    },
+                                    grid: {
+                                        color: 'rgba(200,200,200,0.2)',
+                                        borderDash: [5, 5]
+                                    },
+                                    beginAtZero: false,
+                                    suggestedMin: Math.min(...temperatures) - 2,
+                                    suggestedMax: Math.max(...temperatures) + 2
+                                }
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao buscar dados:', error);
+            }
+        }
+
+        fetchData();
+        setInterval(fetchData, 5000); // Atualiza a cada 5 segundos
+    </script>
 }
