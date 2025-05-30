@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     @RenderSection("styles", false)
 </head>
 <body>
@@ -43,6 +44,9 @@
                 </li>
             </ul>
             <a asp-controller="Chamado" asp-action="Index" class="chamado">Abrir chamado</a>
+            <a href="#" class="user-icon-link" aria-label="User Profile">
+                <i class="fas fa-user-circle user-icon-style"></i>
+            </a>
         </nav>
     </header>
     @RenderSection("MainContentFullWidth", required: false)

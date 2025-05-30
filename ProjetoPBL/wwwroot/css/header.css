@@ -67,6 +67,27 @@ header .navbar-custom {
             text-decoration: none;
         }
 
+    header .navbar-custom .user-icon-link {
+        color: #fff;
+        margin-left: 10px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px; /* Small clickable area around the icon */
+        border-radius: 50%; /* Makes the hover area circular */
+        transition: background-color 0.3s ease;
+    }
+
+        header .navbar-custom .user-icon-link:hover {
+            background-color: rgba(255, 255, 255, 0.2); /* Consistent hover effect */
+        }
+
+        header .navbar-custom .user-icon-link .user-icon-style { /* Targets the <i> icon */
+            font-size: 1.3em; /* Size of the FontAwesome icon */
+            line-height: 1;
+            color: #fff; /* Ensures icon itself is white */
+        }
 
 /* Estilos para o Dropdown */
 header .dropdown .dropbtn {
