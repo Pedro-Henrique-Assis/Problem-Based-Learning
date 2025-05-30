@@ -67,7 +67,15 @@ CREATE TABLE sensor (
     dataInstalacao DATETIME
 );
 ```
+### 🔹 Tabela `Temperaturas`
 
+```sql
+CREATE TABLE Temperaturas (
+    Id INT IDENTITY(1,1) PRIMARY KEY,  
+    SensorId VARCHAR(100) NULL,         
+    RecvTime DATETIME2 NOT NULL,     
+    Temperature FLOAT NOT NULL        
+);
 ---
 
 ## 3. Stored Procedures Genéricas
@@ -258,6 +266,51 @@ BEGIN
 END
 GO
 
+### 🌡️ `temperatura`
+
+```sql
+-- Verifica se já existe um registro
+CREATE PROCEDURE spExisteRegistro
+    @SensorId NVARCHAR(100),
+    @RecvTime DATETIME,
+    @Temperature FLOAT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT COUNT(1) AS RegistroExiste
+    FROM Temperaturas
+    WHERE SensorId = @SensorId
+      AND RecvTime = @RecvTime
+      AND Temperature = @Temperature;
+END
+GO
+
+-- Insere um novo registro de temperatura na tabela Temperaturas
+CREATE PROCEDURE spInserirTemperatura
+    @SensorId NVARCHAR(100),
+    @RecvTime DATETIME,
+    @Temperature FLOAT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO Temperaturas (SensorId, RecvTime, Temperature)
+    VALUES (@SensorId, @RecvTime, @Temperature);
+END
+GO
+
+-- Lista todos os registros da tabela Temperaturas
+CREATE PROCEDURE spListarTemperaturas
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT SensorId, RecvTime, Temperature
+    FROM Temperaturas
+    ORDER BY RecvTime ASC;
+END
+GO
 
 ```
 
