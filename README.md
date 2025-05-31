@@ -77,6 +77,21 @@ CREATE TABLE Temperaturas (
     Temperature FLOAT NOT NULL        
 );
 ```
+
+### 🔹 Tabela `Chamados`
+
+```sql
+CREATE TABLE chamados (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    descricao TEXT NOT NULL,
+    status VARCHAR(50) NOT NULL,
+    data_abertura DATETIME NOT NULL,
+    usuario_id INT NOT NULL,
+    resposta TEXT NULL
+);
+```
+
 ---
 
 ## 3. Stored Procedures Genéricas
@@ -315,5 +330,87 @@ END
 GO
 
 ```
+### 📞 `Chamados`
 
+```sql
+-- Consulta chamado por ID
+CREATE PROCEDURE spConsultaChamadoPorId
+    @id INT
+AS
+BEGIN
+    SELECT * FROM chamados WHERE id = @id;
+END
+GO
 
+-- Consulta todos os chamados
+CREATE PROCEDURE spConsultaChamados
+    @status VARCHAR(50) = NULL,
+    @usuario_id INT = NULL
+AS
+BEGIN
+    SELECT * FROM chamados
+    WHERE (@status IS NULL OR status = @status)
+      AND (@usuario_id IS NULL OR usuario_id = @usuario_id)
+    ORDER BY data_abertura DESC;
+END
+GO
+
+-- Insere novo chamado
+CREATE PROCEDURE spInsertChamados
+    @titulo VARCHAR(255),
+    @descricao TEXT,
+    @status VARCHAR(50),
+    @data_abertura DATETIME,
+    @usuario_id INT,
+    @resposta TEXT = NULL
+AS
+BEGIN
+    INSERT INTO chamados (titulo, descricao, status, data_abertura, usuario_id, resposta)
+    VALUES (@titulo, @descricao, @status, @data_abertura, @usuario_id, @resposta);
+END
+GO
+
+-- Lista todos os chamados (sem filtro)
+CREATE PROCEDURE spListagemChamados
+AS
+BEGIN
+    SELECT * FROM chamados ORDER BY data_abertura DESC;
+END
+GO
+
+-- Atualiza chamado completo (todos os campos exceto id)
+CREATE PROCEDURE spUpdateChamados
+    @id INT,
+    @titulo VARCHAR(255),
+    @descricao TEXT,
+    @status VARCHAR(50),
+    @data_abertura DATETIME,
+    @usuario_id INT,
+    @resposta TEXT = NULL
+AS
+BEGIN
+    UPDATE chamados
+    SET titulo = @titulo,
+        descricao = @descricao,
+        status = @status,
+        data_abertura = @data_abertura,
+        usuario_id = @usuario_id,
+        resposta = @resposta
+    WHERE id = @id;
+END
+GO
+
+-- Atualiza somente status e resposta do chamado
+CREATE PROCEDURE spUpdateStatusRespostaChamado
+    @id INT,
+    @status VARCHAR(50),
+    @resposta TEXT
+AS
+BEGIN
+    UPDATE chamados
+    SET status = @status,
+        resposta = @resposta
+    WHERE id = @id;
+END
+GO
+```
