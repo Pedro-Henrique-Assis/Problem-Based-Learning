@@ -342,18 +342,43 @@ BEGIN
 END
 GO
 
--- Consulta todos os chamados
+-- Consulta os chamados
+USE projeto_pbl
+GO
+
 CREATE PROCEDURE spConsultaChamados
-    @status VARCHAR(50) = NULL,
-    @usuario_id INT = NULL
+    @usuario_id INT,
+    @is_admin BIT
 AS
 BEGIN
-    SELECT * FROM chamados
-    WHERE (@status IS NULL OR status = @status)
-      AND (@usuario_id IS NULL OR usuario_id = @usuario_id)
-    ORDER BY data_abertura DESC;
+    IF @is_admin = 1
+    BEGIN
+        SELECT *
+        FROM chamados
+        ORDER BY data_abertura DESC;
+    END
+    ELSE
+    BEGIN
+        SELECT *
+        FROM chamados
+        WHERE usuario_id = @usuario_id
+        ORDER BY data_abertura DESC;
+    END
 END
 GO
+
+-- Deleta Chamado
+USE projeto_pbl
+GO
+
+CREATE PROCEDURE spDeleteChamados
+    @id INT
+AS
+BEGIN
+    DELETE FROM chamados WHERE id = @id;
+END
+GO
+
 
 -- Insere novo chamado
 CREATE PROCEDURE spInsertChamados
@@ -370,7 +395,7 @@ BEGIN
 END
 GO
 
--- Lista todos os chamados (sem filtro)
+-- Lista todos os chamados
 CREATE PROCEDURE spListagemChamados
 AS
 BEGIN
@@ -378,7 +403,28 @@ BEGIN
 END
 GO
 
--- Atualiza chamado completo (todos os campos exceto id)
+-- Responder Chamado
+
+USE projeto_pbl
+GO
+
+CREATE PROCEDURE spResponderChamado
+    @id INT,
+    @resposta TEXT,
+    @status VARCHAR(50)
+AS
+BEGIN
+    UPDATE chamados
+    SET resposta = @resposta,
+        status = @status
+    WHERE id = @id;
+END
+GO
+
+-- Atualiza chamado
+USE projeto_pbl
+GO
+
 CREATE PROCEDURE spUpdateChamados
     @id INT,
     @titulo VARCHAR(255),
@@ -400,17 +446,4 @@ BEGIN
 END
 GO
 
--- Atualiza somente status e resposta do chamado
-CREATE PROCEDURE spUpdateStatusRespostaChamado
-    @id INT,
-    @status VARCHAR(50),
-    @resposta TEXT
-AS
-BEGIN
-    UPDATE chamados
-    SET status = @status,
-        resposta = @resposta
-    WHERE id = @id;
-END
-GO
 ```
