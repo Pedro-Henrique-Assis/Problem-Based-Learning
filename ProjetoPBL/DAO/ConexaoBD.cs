@@ -10,7 +10,7 @@ namespace ProjetoPBL.DAO
         /// <returns>Conexão aberta</returns>
         public static SqlConnection GetConexao()
         {
-            string strCon = "Data Source=LOCALHOST; Database=projeto_pbl; user id=sa; password=123456";
+            string strCon = "Data Source=LOCALHOST; Database=projeto_pbl; Integrated Security=True";
             SqlConnection conexao = new SqlConnection(strCon);
             conexao.Open();
             return conexao;
