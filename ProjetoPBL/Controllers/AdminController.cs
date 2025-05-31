@@ -178,5 +178,18 @@ namespace ProjetoPBL.Controllers
         {
             return View();
         }
+
+        public IActionResult ObtemChamados()
+        {
+            if (!IsUserAdmin())
+                return Unauthorized();
+
+            var usuarioId = Convert.ToInt32(HttpContext.Session.GetString("IdUsuario"));
+            var chamadoDao = new ChamadoDAO();
+            var chamados = chamadoDao.ConsultaChamadosPorPermissao(usuarioId, true);
+
+
+            return PartialView("~/Views/Chamado/pvGridChamados.cshtml", chamados);
+        }
     }
 }
