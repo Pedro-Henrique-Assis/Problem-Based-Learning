@@ -1,8 +1,185 @@
 ﻿@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Dashboard1";
+    ViewData["Title"] = "Modelo de Regressão Linear - Temperatura x Voltagem";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<h2 style="text-align: center;">@ViewData["Title"]</h2>
+
+<div style="text-align: center;">
+    <canvas id="graficoTemperatura" width="700" height="400"></canvas>
+</div>
+
+<div style="margin-top: 30px;">
+    
+
+    <p><strong>Medições por temperatura:</strong></p>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Temperatura (°C)</th>
+                <th>Medição 1</th>
+                <th>Medição 2</th>
+                <th>Medição 3</th>
+                <th>Medição 4</th>
+                <th>Medição 5</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>30</td><td>3,03</td><td>2,91</td><td>2,95</td><td>2,95</td><td>2,97</td></tr>
+            <tr><td>35</td><td>3,54</td><td>3,51</td><td>3,51</td><td>3,48</td><td>3,48</td></tr>
+            <tr><td>40</td><td>3,95</td><td>3,94</td><td>3,90</td><td>3,99</td><td>3,98</td></tr>
+            <tr><td>45</td><td>4,46</td><td>4,50</td><td>4,48</td><td>4,50</td><td>4,48</td></tr>
+            <tr><td>50</td><td>4,94</td><td>4,99</td><td>4,96</td><td>4,98</td><td>4,96</td></tr>
+            <tr><td>55</td><td>5,40</td><td>5,48</td><td>5,45</td><td>5,47</td><td>5,48</td></tr>
+        </tbody>
+    </table>
+
+    <p><strong>Cálculo Real e Ponderações:</strong></p>
+    <table class="table table-sm table-striped table-bordered" style="font-size: 13px;">
+        <thead class="thead-dark">
+            <tr>
+                <th>i</th>
+                <th>x' (V)</th>
+                <th>y' (°C)</th>
+                <th>σ</th>
+                <th>Peso</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>2,961</td><td>30</td><td>0,0401</td><td>622,23</td></tr>
+            <tr><td>2</td><td>3,502</td><td>35</td><td>0,0211</td><td>2236,58</td></tr>
+            <tr><td>3</td><td>3,952</td><td>40</td><td>0,0318</td><td>988,58</td></tr>
+            <tr><td>4</td><td>4,484</td><td>45</td><td>0,0150</td><td>4464,29</td></tr>
+            <tr><td>5</td><td>4,964</td><td>50</td><td>0,0161</td><td>3839,59</td></tr>
+            <tr><td>6</td><td>5,455</td><td>55</td><td>0,0285</td><td>1232,20</td></tr>
+        </tbody>
+    </table>
+
+    <p><strong>Funções:</strong></p>
+    <p>Função Xw = 44,617 | Soma dos Pesos = 13383,47</p>
+    <p>Função Yw = 4,437</p>
+
+    <p><strong>Produto Ponderado e Quadrado:</strong></p>
+    <table class="table table-sm table-bordered" style="font-size: 13px;">
+        <thead class="thead-light">
+            <tr>
+                <th>i</th>
+                <th>(x'-x^w)</th>
+                <th>(y'-y^w)</th>
+                <th>Produto</th>
+                <th>Peso × Produto</th>
+                <th>Peso × (x'-x^w)²</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>-14,617</td><td>-1,4758</td><td>21,5721</td><td>13422,93</td><td>132949,50</td></tr>
+            <tr><td>2</td><td>-9,617</td><td>-0,9351</td><td>8,9934</td><td>20114,50</td><td>206865,60</td></tr>
+            <tr><td>3</td><td>-4,617</td><td>-0,4851</td><td>2,2399</td><td>2214,40</td><td>21075,65</td></tr>
+            <tr><td>4</td><td>0,383</td><td>0,0469</td><td>0,0179</td><td>80,08</td><td>653,93</td></tr>
+            <tr><td>5</td><td>5,383</td><td>0,5275</td><td>2,8396</td><td>10902,81</td><td>111247,40</td></tr>
+            <tr><td>6</td><td>10,383</td><td>1,0182</td><td>10,5717</td><td>13026,48</td><td>132832,63</td></tr>
+        </tbody>
+    </table>
+    <p>Somatórios: Produto × Peso = <strong>59761,20</strong> | Peso × (x'-x^w)² = <strong>605624,72</strong></p>
+
+    <p><strong>Coeficientes da Regressão Ponderada:</strong></p>
+    <p>B1 = <strong>0,09868</strong> | B0 = <strong>0,03444</strong></p>
+
+    <p><strong>Resíduos:</strong></p>
+    <table class="table table-sm table-bordered" style="font-size: 13px;">
+        <thead>
+            <tr>
+                <th>i</th>
+                <th>y^i</th>
+                <th>ri</th>
+                <th>w·ri²</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>2,9947</td><td>-0,0334</td><td>0,6946</td></tr>
+            <tr><td>2</td><td>3,4881</td><td>0,0139</td><td>0,4303</td></tr>
+            <tr><td>3</td><td>3,9815</td><td>-0,0295</td><td>0,8611</td></tr>
+            <tr><td>4</td><td>4,4749</td><td>0,0091</td><td>0,3698</td></tr>
+            <tr><td>5</td><td>4,9683</td><td>-0,0036</td><td>0,0502</td></tr>
+            <tr><td>6</td><td>5,4617</td><td>-0,0063</td><td>0,0494</td></tr>
+        </tbody>
+    </table>
+    <p>
+        Soma dos resíduos ponderados: <strong>2,4555</strong><br>
+        Variação Residual Ponderada σ² = <strong>0,61388</strong>
+    </p>
+
+    <p><strong>Incertezas:</strong></p>
+    <h5>Coeficiente Angular</h5>
+    <ul>
+        <li>Incerteza do Coeficiente Angular: 1,01363E-06</li>
+        <li>Raiz Quadrada do Coeficiente Angular: 0,00100679</li>
+        <li>Desvio Padrão Relativo B1: 1,3192%</li>
+    </ul>
+    <h5>Coeficiente Linear</h5>
+    <ul>
+        <li>Incerteza do Coeficiente Linear: 0,002063695</li>
+        <li>Raiz Quadrada do Coeficiente Linear: 0,045427913</li>
+        <li>Desvio Padrão Relativo B0: 1,0202%</li>
+    </ul>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const dados = {
+            datasets: [
+                {
+                    label: 'Medições Reais',
+                    data: [
+                        { x: 3.03, y: 30 }, { x: 2.906666667, y: 30 }, { x: 2.95, y: 30 }, { x: 2.95, y: 30 }, { x: 2.97, y: 30 },
+                        { x: 3.536666667, y: 35 }, { x: 3.506666667, y: 35 }, { x: 3.506666667, y: 35 }, { x: 3.476666667, y: 35 }, { x: 3.483333333, y: 35 },
+                        { x: 3.946666667, y: 40 }, { x: 3.936666667, y: 40 }, { x: 3.903333333, y: 40 }, { x: 3.99, y: 40 }, { x: 3.983333333, y: 40 },
+                        { x: 4.46, y: 45 }, { x: 4.5, y: 45 }, { x: 4.48, y: 45 }, { x: 4.5, y: 45 }, { x: 4.48, y: 45 },
+                        { x: 4.943333333, y: 50 }, { x: 4.986666667, y: 50 }, { x: 4.956666667, y: 50 }, { x: 4.98, y: 50 }, { x: 4.956666667, y: 50 },
+                        { x: 5.403333333, y: 55 }, { x: 5.476666667, y: 55 }, { x: 5.446666667, y: 55 }, { x: 5.47, y: 55 }, { x: 5.48, y: 55 }
+                    ],
+                    showLine: false,
+                    backgroundColor: 'red',
+                    pointRadius: 5
+                },
+                {
+                    label: 'Regressão Linear',
+                    data: Array.from({length: 61}, (_, i) => {
+                        let x = 2.9 + i * 0.05;
+                        let y = 10.05 * x + 0.09;
+                        return { x, y };
+                    }),
+                    type: 'line',
+                    borderWidth: 2,
+                    borderColor: 'blue',
+                    fill: false
+                }
+            ]
+        };
+
+        const config = {
+            type: 'scatter',
+            data: dados,
+            options: {
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Voltagem (V)' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Temperatura (°C)' },
+                        min: 25,
+                        max: 60
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                       
+                    }
+                }
+            }
+        };
+
+        new Chart(document.getElementById('graficoTemperatura'), config);
+    </script>
 }
