@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="utf-8" />
@@ -44,9 +46,20 @@
                 </li>
             </ul>
             <a asp-controller="Chamado" asp-action="Index" class="chamado">Abrir chamado</a>
-            <a href="#" class="user-icon-link" aria-label="User Profile">
-                <i class="fas fa-user-circle user-icon-style"></i>
-            </a>
+            @if (HttpContextAccessor.HttpContext.Session.GetString("Logado") == "true")
+            {
+                @* <a href="/Usuario/Edit/?id=@HttpContextAccessor.HttpContext.Session.GetString("IdUsuario")" class="user-icon-link" aria-label="User Profile">
+                    <i class="fas fa-user-circle user-icon-style"></i>
+                </a> *@
+                <a asp-controller="Usuario"
+                   asp-action="Edit"
+                   asp-route-id="@HttpContextAccessor.HttpContext.Session.GetString("IdUsuario")"
+                   asp-route-source="profile"
+                   class="user-icon-link"
+                   aria-label="Editar Perfil">
+                    <i class="fas fa-user-circle user-icon-style"></i>
+                </a>
+            }
         </nav>
     </header>
     @RenderSection("MainContentFullWidth", required: false)

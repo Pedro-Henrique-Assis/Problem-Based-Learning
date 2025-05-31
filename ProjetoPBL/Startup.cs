@@ -24,6 +24,8 @@ namespace ProjetoPBL
         {
             services.AddControllersWithViews();
 
+            services.AddHttpContextAccessor();
+
             services.AddSession(options =>
             {
                 options.Cookie.IsEssential = true; // GDPR mais detalhes em https://andrewlock.net/session-state-gdpr-and-non-essential-cookies/ 

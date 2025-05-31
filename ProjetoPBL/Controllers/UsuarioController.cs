@@ -155,6 +155,28 @@ namespace ProjetoPBL.Controllers
                             usuario.Senha = usuarioAtual.Senha;
                         }
 
+                        string loggedInUserIdStr = HttpContext.Session.GetString("IdUsuario");
+                        string loggedInUserIsAdminSessionStr = HttpContext.Session.GetString("IsAdmin");
+                        bool editorIsAdmin = loggedInUserIsAdminSessionStr == "True";
+                        int.TryParse(loggedInUserIdStr, out int loggedInUserId);
+                        bool isAdminFieldPresentInForm = Request.Form.ContainsKey(nameof(UsuarioViewModel.IsAdmin));
+
+                        if (usuario.Id == loggedInUserId) // Usuário logado está editando o próprio perfil
+                        {
+                            usuario.IsAdmin = usuarioAtual.IsAdmin;
+                        }
+                        else if (editorIsAdmin) // Usuário logado é um Admin e está editando OUTRO usuário
+                        {
+                            if (!isAdminFieldPresentInForm)
+                            {
+                                usuario.IsAdmin = usuarioAtual.IsAdmin;
+                            }
+                        }
+                        else
+                        {
+                            usuario.IsAdmin = usuarioAtual.IsAdmin;
+                        }
+
                         // Lógica da Imagem: Se uma nova imagem não foi enviada E não foi solicitado para remover,
                         // mantém a imagem antiga.
                         if (usuario.Imagem == null && !usuario.RemoverImagemAtual)
@@ -210,5 +232,87 @@ namespace ProjetoPBL.Controllers
             else
                 return null;
         }
+
+        public override IActionResult Edit(int id)
+        {
+            ViewBag.Operacao = "A";
+            var model = DAO.Consulta(id);
+
+            if (model == null)
+                return RedirectToAction(NomeViewIndex);
+
+            // Captura o parâmetro 'source' da query string
+            if (Request.Query.ContainsKey("source"))
+            {
+                ViewBag.Source = Request.Query["source"].ToString();
+            }
+
+            PreencheDadosParaView("A", model);
+            return View(NomeViewForm, model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public override IActionResult Save(UsuarioViewModel model, string Operacao)
+        {
+            string source = Request.Form["Source"];
+
+            try
+            {
+                if (Operacao == "I" && GeraProximoId && model.Id == 0) // Segurança extra caso o ID não tenha sido gerado
+                {
+                    model.Id = DAO.ProximoId();
+                }
+
+                ValidaDados(model, Operacao);
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.Operacao = Operacao;
+                    ViewBag.Source = source;
+                    PreencheDadosParaView(Operacao, model);
+                    return View(NomeViewForm, model);
+                }
+                else
+                {
+                    if (Operacao == "I")
+                        DAO.Insert(model);
+                    else
+                        DAO.Update(model);
+
+                    return GetSaveRedirectAction(Operacao, source);
+                }
+            }
+            catch (Exception erro)
+            {
+                ViewBag.Operacao = Operacao;
+                ViewBag.Source = source;
+                PreencheDadosParaView(Operacao, model);
+                ModelState.AddModelError(string.Empty, "Ocorreu um erro ao salvar as alterações: " + erro.Message);
+                return View(NomeViewForm, model);
+            }
+        }
+
+        protected IActionResult GetSaveRedirectAction(string operacao, string source = null)
+        {
+            if (operacao == "I")
+            {
+                return RedirectToAction("Index", "Login");
+            }
+            else if (operacao == "A")
+            {
+                if ("profile".Equals(source, StringComparison.OrdinalIgnoreCase))
+                {
+                    TempData["MensagemSucesso"] = "Perfil atualizado com sucesso!";
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    TempData["MensagemSucessoAdmin"] = "Usuário atualizado com sucesso!";
+                    return RedirectToAction("ConsultaAvancada", "Admin");
+                }
+            }
+            return RedirectToAction(NomeViewIndex);
+        }
+
     }
 }

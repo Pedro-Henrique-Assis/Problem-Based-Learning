@@ -99,7 +99,7 @@ namespace ProjetoPBL.Controllers
                 ModelState.AddModelError("Id", "Id inválido!");
         }
 
-        public IActionResult Edit(int id)
+        public virtual IActionResult Edit(int id)
         {
             try
             {

@@ -16,6 +16,10 @@
 
         <div class="form-body">
             <input type="hidden" name="Operacao" value="@ViewBag.Operacao" />
+            @if (ViewBag.Source != null)
+            {
+                <input type="hidden" name="Source" value="@ViewBag.Source" />
+            }
             <input asp-for="Id" type="hidden" readonly />
             <input type="hidden" asp-for="RemoverImagemAtual" id="RemoverImagemAtual" value="false" />
 
@@ -125,7 +129,6 @@
             }
             <br />
         </div>
-        
     </form>
 </div>
 
@@ -134,108 +137,8 @@
 @{
     await Html.RenderPartialAsync("_ValidationScriptsPartial");
 }
-@* <script>
-    function buscaCEP() {
-        var cep = document.getElementById("cep").value;
-        cep = cep.replace(/[^0-9]/g, ''); // Removemos tudo que não é dígito
-
-        if (cep.length === 8) { // Verifica se temos 8 dígitos
-            var linkAPI = 'https://viacep.com.br/ws/' + cep + '/json/';
-            $.ajax({
-                url: linkAPI,
-                dataType: 'json', // Informa ao jQuery para esperar JSON
-                beforeSend: function () {
-                    document.getElementById("logradouro").value = '...';
-                    document.getElementById("cidade").value = '...';
-                    document.getElementById("estado").value = '...';
-                },
-                success: function (dados) {
-                    if (dados.erro != undefined) { // quando o CEP não existe...
-                        alert('CEP não localizado...');
-                        document.getElementById("logradouro").value = '';
-                        document.getElementById("cidade").value = '';
-                        document.getElementById("estado").value = '';
-                    }
-                    else { // quando o CEP existe
-                        document.getElementById("logradouro").value = dados.logradouro;
-                        document.getElementById("cidade").value = dados.localidade;; // Usa 'localidade' da API para 'cidade'
-                        document.getElementById("estado").value = dados.estado;
-                        $("#numero").focus(); // Foca no campo número após o sucesso
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    alert('Falha ao buscar CEP. Verifique o CEP ou a conexão.');
-                    console.error("Erro ViaCEP:", textStatus, errorThrown);
-                    $("#logradouro").val('');
-                    $("#cidade").val('');
-                    $("#estado").val('');
-                }
-            });
-        } else if (cep.length > 0) {
-            alert('CEP inválido. Deve conter 8 dígitos.');
-            document.getElementById("logradouro").value = '';
-            document.getElementById("cidade").value = '';
-            document.getElementById("estado").value = '';
-        } else {
-            alert('Por favor, digite um CEP.');
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const inputImagem = document.getElementById("Imagem");
-        const imgPreview = document.getElementById("imgPreview");
-        const nomeArquivoSpan = document.getElementById("nome-arquivo");
-        const removeImageBtn = document.getElementById("removeImageBtn");
-        const removerImagemAtualInput = document.getElementById("RemoverImagemAtual");
-
-        const defaultPreviewSrc = "data:image/jpeg;base64,@Model.ImagemEmBase64";
-        const hasExistingImage = defaultPreviewSrc && !defaultPreviewSrc.endsWith("base64,");
-
-        // Função para atualizar a UI (Interface do Usuário)
-        function updateUI(showPreview, showRemoveBtn, fileName) {
-            imgPreview.style.display = showPreview ? 'inline-block' : 'none';
-            removeImageBtn.style.display = showRemoveBtn ? 'inline-block' : 'none';
-            nomeArquivoSpan.textContent = fileName || "Nenhum arquivo selecionado";
-
-            if (showPreview && imgPreview.src.endsWith("base64,")) {
-                imgPreview.style.display = 'none'; // Não mostrar se for base64 vazia
-            }
-        }
-
-        // Evento ao selecionar um arquivo
-        inputImagem.addEventListener('change', function () {
-            if (inputImagem.files && inputImagem.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    imgPreview.src = e.target.result;
-                    updateUI(true, true, inputImagem.files[0].name);
-                };
-                reader.readAsDataURL(inputImagem.files[0]);
-                removerImagemAtualInput.value = "false";
-            }
-        });
-
-        // Evento ao clicar no botão de remover
-        removeImageBtn.addEventListener('click', function () {
-            inputImagem.value = null; // Limpa o input
-            imgPreview.src = '';      // Limpa a pré-visualização
-            updateUI(false, false, null); // Atualiza a UI
-            removerImagemAtualInput.value = "true"; // Marca para remoção
-        });
-
-        // Configuração inicial ao carregar a página
-        if (hasExistingImage) {
-                imgPreview.src = defaultPreviewSrc;
-                updateUI(true, true, "Imagem atual carregada");
-        } else {
-                updateUI(false, false, null);
-        }
-    });
-</script> *@
-
-
 <script>
-    // Função para buscar o CEP (mantida como está)
+    // Função para buscar o CEP
     function buscaCEP() {
         var cep = document.getElementById("cep").value;
         cep = cep.replace(/[^0-9]/g, '');
