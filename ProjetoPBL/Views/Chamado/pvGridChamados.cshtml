@@ -1,0 +1,30 @@
+﻿@model List<ProjetoPBL.Models.ChamadoViewModel>
+
+<table class="table table-striped table-bordered mt-4">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Usuário</th>
+            <th>Status</th>
+            <th>Data de Abertura</th>
+            <th>Resposta</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.Titulo</td>
+                <td>@c.UsuarioId</td>
+                <td>@c.Status</td>
+                <td>@c.DataAbertura.ToString("dd/MM/yyyy")</td>
+                <td>@(string.IsNullOrEmpty(c.Resposta) ? "Sem resposta" : c.Resposta)</td>
+                <td>
+                    <a href="@Url.Action("Responder", "Chamado", new { id = c.Id })" class="btn btn-sm btn-info">Responder</a>
+                    <a href="@Url.Action("Excluir", "Chamado", new { id = c.Id })" class="btn btn-sm btn-danger">Excluir</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

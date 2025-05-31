@@ -1,0 +1,93 @@
+﻿@model ProjetoPBL.Models.ChamadoViewModel
+@{
+    string operacao = ViewBag.Operacao as string ?? "I";
+    bool isDelete = operacao == "D";
+    bool isResponder = operacao == "R";
+
+    ViewData["Title"] = isDelete ? "Confirmação de Exclusão" :
+                          (isResponder ? "Responder Chamado" :
+                          (operacao == "I" ? "Cadastro de Chamado" : "Edição de Chamado"));
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/cadastroChamados.css" asp-append-version="true" />
+}
+
+<div class="container-externo-forms">
+    <form id="formChamado" asp-controller="Chamado"
+          asp-action="@(isDelete ? "ExcluirConfirmado" : (operacao == "I" ? "Create" : (isResponder ? "Responder" : "Editar")))"
+          method="post">
+
+        <div class="title">@ViewData["Title"]</div>
+
+        <div class="form-body">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" name="Operacao" value="@operacao" />
+
+            <div class="form-group">
+                <label>Título</label>
+                <input asp-for="Titulo"
+                       readonly="@(isDelete || isResponder ? "readonly" : null)"
+                       required="@(isDelete ? null : "required")" />
+                <span asp-validation-for="Titulo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Descrição</label>
+                <textarea asp-for="Descricao" rows="5"
+                          readonly="@(isDelete || isResponder ? "readonly" : null)"
+                          required="@(isDelete ? null : "required")"></textarea>
+                <span asp-validation-for="Descricao" class="text-danger"></span>
+            </div>
+
+            @if (isResponder)
+            {
+                <div class="form-group">
+                    <label>Resposta</label>
+                    <textarea asp-for="Resposta" rows="5" required></textarea>
+                    <span asp-validation-for="Resposta" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Status</label>
+                    <select asp-for="Status" required>
+                        <option value="Aberto" selected="@(Model.Status == "Aberto")">Aberto</option>
+                        <option value="Em Andamento" selected="@(Model.Status == "Em Andamento")">Em Andamento</option>
+                        <option value="Fechado" selected="@(Model.Status == "Fechado")">Fechado</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+            }
+            else if (isDelete)
+            {
+                <p class="form-group" style="color: #856404; background: #fff3cd; padding: 15px; border-radius: 8px;">
+                    Tem certeza que deseja excluir este chamado?
+                </p>
+            }
+
+            <div class="form-group">
+                @if (isDelete)
+                {
+                    <input type="submit" class="btn-primary" value="Confirmar Exclusão" />
+                    <a asp-action="Index" class="btn-primary">Cancelar</a>
+                }
+                else
+                {
+                    <input type="submit" class="btn-primary" value="@(operacao == "I" ? "Salvar" : (isResponder ? "Enviar Resposta" : "Atualizar"))" />
+                    <a asp-action="Index" class="btn-primary">Voltar para Lista</a>
+                }
+            </div>
+
+            @if (ViewBag.Erro != null)
+            {
+                <div class="form-group" style="color: #721c24; background: #f8d7da; padding: 12px; border-radius: 8px;">
+                    @ViewBag.Erro
+                </div>
+            }
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @Html.Partial("_ValidationScriptsPartial")
+}

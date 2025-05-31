@@ -1,8 +1,75 @@
-﻿@{
+﻿@model IEnumerable<ProjetoPBL.Models.ChamadoViewModel>
+
+@{
     ViewData["Title"] = "Abertura de chamados";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    int usuarioIdLogado = ViewBag.UsuarioId ?? 0;
+    bool isAdmin = ViewBag.IsAdmin ?? false;
 }
 
 @section Styles {
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="~/css/cadastroChamados.css" asp-append-version="true" />
 }
+
+<div class="container-externo-forms" style="flex-direction: column;">
+    <div class="title">Canal de Suporte</div>
+
+    <div class="form-body">
+        @if (TempData["Sucesso"] != null)
+        {
+            <div class="alert alert-success">@TempData["Sucesso"]</div>
+        }
+        @if (TempData["Erro"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Erro"]</div>
+        }
+
+        <p>
+            <a asp-action="Create" class="btn-novo">Novo Chamado</a>
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Id do Chamado</th>
+                    <th>Título</th>
+                    <th>Status</th>
+                    <th>Data de Abertura</th>
+                    <th>Resposta</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var chamado in Model)
+                {
+                    <tr>
+                        <td>@chamado.Id</td>
+                        <td>@chamado.Titulo</td>
+                        <td>@chamado.Status</td>
+                        <td>@chamado.DataAbertura.ToString("dd/MM/yyyy")</td>
+                        <td>@(string.IsNullOrEmpty(chamado.Resposta) ? "Sem resposta" : chamado.Resposta)</td>
+                        <td>
+                            <a asp-action="Editar" asp-route-id="@chamado.Id" class="btn-acao btn-editar">Editar</a>
+
+
+                            @if (isAdmin || chamado.UsuarioId == usuarioIdLogado)
+                            {
+                                <form asp-action="ExcluirConfirmado" asp-route-id="@chamado.Id" method="post" style="display:inline">
+                                    <button type="submit" class="btn-acao btn-excluir"
+                                            onclick="return confirm('Tem certeza que deseja excluir este chamado?');">
+                                        Excluir
+                                    </button>
+                                </form>
+                            }
+
+                            @if (isAdmin)
+                            {
+                                <a asp-action="Responder" asp-route-id="@chamado.Id" class="btn-acao btn-responder">Responder</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
