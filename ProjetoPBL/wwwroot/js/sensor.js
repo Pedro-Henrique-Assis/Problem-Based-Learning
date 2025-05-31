@@ -26,3 +26,20 @@
         }
     });
 }
+
+function confirmarExclusaoSensor(sensorId, sensorNome) {
+    Swal.fire({
+        title: 'Deseja excluir este sensor?',
+        text: `Sensor "${sensorNome}" (ID: ${sensorId}) será excluído permanentemente.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, excluir',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '/Sensor/Delete/' + sensorId;
+        }
+    });
+}

@@ -12,8 +12,12 @@ namespace ProjetoPBL.Controllers
     /// </summary>
     public class SensorController : PadraoController<SensorViewModel>
     {
+        // ============================================================================
+        // CONSTRUTOR
+        // ============================================================================
+
         /// <summary>
-        /// Construtor do controller que inicializa o DAO específico e configura geração automática de ID.
+        /// Inicializa o DAO específico para sensor e define se o ID será gerado automaticamente.
         /// </summary>
         public SensorController()
         {
@@ -21,29 +25,13 @@ namespace ProjetoPBL.Controllers
             GeraProximoId = true;
         }
 
-        /// <summary>
-        /// Valida dados e realiza integração com FIWARE antes de inserir um sensor.
-        /// Verifica se o servidor FIWARE está disponível e cria o sensor via API.
-        /// </summary>
-        /// <param name="model">Objeto sensor a ser validado</param>
-        /// <param name="operacao">Tipo de operação: "I" para inserir</param>
-        private async Task ValidarDadosFiware(SensorViewModel model, string operacao)
-        {
-            if (!await HelperFiwareDAO.VerificarServer(HelperFiwareDAO.host))
-            {
-                ModelState.AddModelError("nomeSensor", "Servidor FIWARE indisponível no momento.");
-                return;
-            }
-
-            if (operacao == "I")
-            {
-                await HelperFiwareDAO.CriarSensorTemperatura(HelperFiwareDAO.host, model.nomeSensor);
-            }
-        }
+        // ============================================================================
+        // VALIDAÇÕES
+        // ============================================================================
 
         /// <summary>
         /// Valida os dados do formulário antes de inserir ou editar.
-        /// Inclui validações específicas para sensor e chama validação externa FIWARE.
+        /// Inclui validações específicas para sensor e integração com FIWARE.
         /// </summary>
         /// <param name="model">Objeto sensor</param>
         /// <param name="operacao">Operação atual ("I" ou "A")</param>
@@ -53,11 +41,11 @@ namespace ProjetoPBL.Controllers
 
             SensorDAO sDAO = new SensorDAO();
 
+            // Verifica duplicidade no nome do sensor (apenas para inserção)
             if (operacao == "I" && sDAO.VerificarSensoresRepetidos(model.nomeSensor) > 0)
-            {
                 ModelState.AddModelError("nomeSensor", "Já existe um sensor com esse nome.");
-            }
 
+            // Validações obrigatórias
             if (string.IsNullOrWhiteSpace(model.descricaoSensor))
                 ModelState.AddModelError("descricaoSensor", "A descrição é obrigatória.");
 
@@ -70,14 +58,35 @@ namespace ProjetoPBL.Controllers
             if (model.dataInstalacao > DateTime.Now)
                 ModelState.AddModelError("dataInstalacao", "A data de instalação não pode estar no futuro.");
 
-            // Validação externa só se as validações locais passarem
+            // Integração com FIWARE somente se todas as validações passarem
             if (ModelState.IsValid && operacao == "I")
                 ValidarDadosFiware(model, operacao).GetAwaiter().GetResult();
         }
 
         /// <summary>
-        /// Sobrescreve o método Save para inserir ou atualizar sensor,
-        /// adicionando mensagens de sucesso via TempData.
+        /// Verifica disponibilidade do FIWARE e realiza a criação do sensor via API.
+        /// </summary>
+        /// <param name="model">Objeto sensor</param>
+        /// <param name="operacao">Tipo de operação: "I" para inserir</param>
+        private async Task ValidarDadosFiware(SensorViewModel model, string operacao)
+        {
+            if (!await HelperFiwareDAO.VerificarServer(HelperFiwareDAO.host))
+            {
+                ModelState.AddModelError("nomeSensor", "Servidor FIWARE indisponível no momento.");
+                return;
+            }
+
+            if (operacao == "I")
+                await HelperFiwareDAO.CriarSensorTemperatura(HelperFiwareDAO.host, model.nomeSensor);
+        }
+
+        // ============================================================================
+        // AÇÕES DE FORMULÁRIO
+        // ============================================================================
+
+        /// <summary>
+        /// Salva o sensor no banco de dados e no FIWARE,
+        /// tratando tanto inserções quanto atualizações.
         /// </summary>
         /// <param name="model">Objeto sensor</param>
         /// <param name="operacao">Operação ("I" para inserir, "A" para atualizar)</param>
@@ -87,16 +96,14 @@ namespace ProjetoPBL.Controllers
         {
             try
             {
-                // Gera ID automaticamente se necessário na inserção
+                // Gera ID automaticamente, se necessário
                 if (operacao == "I" && model.Id == 0 && GeraProximoId)
-                {
                     PreencheDadosParaView(operacao, model);
-                }
 
-                // Valida dados do sensor
+                // Valida os dados preenchidos
                 ValidaDados(model, operacao);
 
-                // Se houver erro de validação, retorna para o formulário
+                // Caso ocorram erros, retorna ao formulário com os dados
                 if (!ModelState.IsValid)
                 {
                     ViewBag.Operacao = operacao;
@@ -104,7 +111,7 @@ namespace ProjetoPBL.Controllers
                     return View("Form", model);
                 }
 
-                // Executa inserção ou atualização no banco
+                // Executa operação no banco de dados
                 if (operacao == "I")
                 {
                     DAO.Insert(model);
@@ -116,7 +123,6 @@ namespace ProjetoPBL.Controllers
                     TempData["Mensagem"] = "Sensor atualizado com sucesso!";
                 }
 
-                // Redireciona após salvar
                 return GetSaveRedirectAction(operacao);
             }
             catch (Exception erro)
@@ -126,8 +132,7 @@ namespace ProjetoPBL.Controllers
         }
 
         /// <summary>
-        /// Preenche dados padrão para as views,
-        /// por exemplo definindo data de instalação na inserção.
+        /// Define valores padrão para o modelo, como a data de instalação atual.
         /// </summary>
         /// <param name="Operacao">Operação atual ("I" ou "A")</param>
         /// <param name="model">Objeto sensor</param>
@@ -139,25 +144,28 @@ namespace ProjetoPBL.Controllers
                 model.dataInstalacao = DateTime.Now;
         }
 
+        // ============================================================================
+        // AÇÃO DE EXCLUSÃO
+        // ============================================================================
+
         /// <summary>
-        /// Sobrescreve o método Delete para também excluir o sensor no FIWARE
-        /// antes de apagar localmente.
+        /// Exclui o sensor do banco de dados e também do FIWARE.
         /// </summary>
         /// <param name="id">ID do sensor a ser excluído</param>
-        /// <returns>Redirect para lista ou view de erro</returns>
+        /// <returns>Redirect para a lista de sensores</returns>
         public override IActionResult Delete(int id)
         {
             try
             {
-                // Consulta sensor para obter dados
+                // Recupera o sensor a ser excluído
                 var sensor = DAO.Consulta(id);
                 if (sensor == null)
                     return RedirectToAction("Index");
 
-                // Exclui sensor no FIWARE (chamada síncrona)
+                // Remove o sensor do FIWARE
                 HelperFiwareDAO.ExcluirSensor(HelperFiwareDAO.host, sensor.nomeSensor).GetAwaiter().GetResult();
 
-                // Exclui sensor localmente no banco de dados
+                // Remove do banco de dados
                 DAO.Delete(id);
 
                 TempData["Mensagem"] = "Sensor excluído com sucesso, incluindo o FIWARE.";

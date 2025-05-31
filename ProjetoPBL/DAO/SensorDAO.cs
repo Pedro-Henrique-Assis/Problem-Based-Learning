@@ -78,7 +78,7 @@ namespace ProjetoPBL.DAO
 
         public List<SensorViewModel> ConsultaAvancada(string local, decimal? valorMin, decimal? valorMax, DateTime? dataInicial, DateTime? dataFinal)
         {
-            var lista = Listagem(); // ou um SELECT com WHERE
+            var lista = Listagem();
 
             if (!string.IsNullOrEmpty(local))
                 lista = lista.Where(s => s.localInstalacao.Contains(local)).ToList();

@@ -2,6 +2,12 @@
 
 namespace ProjetoPBL.Models
 {
+
+    /// <summary>
+    /// ViewModel com os dados principais de um sensor.
+    /// Utilizada nas operações de cadastro e consulta.
+    /// </summary>
+    
     public class SensorViewModel : PadraoViewModel
     {
         public string nomeSensor { get; set; }
@@ -13,4 +19,4 @@ namespace ProjetoPBL.Models
     }
 }
 
-//teste
+

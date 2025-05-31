@@ -6,6 +6,7 @@
 }
 
 @section Styles {
+           <link rel="stylesheet" href="~/css/consultaAvancadaSensor.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 }
 
@@ -33,9 +34,11 @@
                 <label for="dataFinal" class="form-label">Data Final</label>
                 <input type="date" id="dataFinal" class="form-control" />
             </div>
-            <div class="col-md-1 d-flex align-items-end">
-                <button type="button" class="btn btn-primary w-100" onclick="aplicaFiltroSensor()">Filtrar</button>
-            </div>
+            <div class="col-md-2 d-flex align-items-end mt-2">
+    <button type="button" class="btnFiltro w-100" style="height: 42px;" onclick="aplicaFiltroSensor()">Filtrar</button>
+</div>
+
+
         </div>
     </fieldset>
 </body>
