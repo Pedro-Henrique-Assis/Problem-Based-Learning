@@ -175,7 +175,9 @@ CREATE PROCEDURE spConsultaAvancadaUsuarios
 	@estado varchar(max),
 	@sexoId int,
 	@dataInicial datetime, 
-	@dataFinal datetime) 
+	@dataFinal datetime,
+	@login varchar(max)
+) 
 AS 
 BEGIN 
 	DECLARE @categIni INT 
@@ -186,6 +188,7 @@ BEGIN
 	FROM usuarios 
 	INNER JOIN sexos ON usuarios.sexoId = sexos.Id 
 	WHERE usuarios.nome LIKE '%' + @nome + '%' AND
+	usuarios.loginUsuario LIKE '%' + @login + '%' AND
 	usuarios.estado LIKE '%' + @estado + '%' AND
 	usuarios.data_nascimento BETWEEN @dataInicial AND @dataFinal AND 
 	usuarios.sexoId BETWEEN @categIni AND @categFim; 
