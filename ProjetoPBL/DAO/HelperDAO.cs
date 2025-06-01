@@ -86,6 +86,13 @@ namespace ProjetoPBL.DAO
         }
 
 
+        /// <summary>
+        /// Executa uma stored procedure de consulta que requer um único parâmetro.
+        /// É um método de conveniência que encapsula a chamada para ExecutaProcSelect.
+        /// </summary>
+        /// <param name="nomeProc">O nome da stored procedure a ser executada.</param>
+        /// <param name="parametro">O único SqlParameter necessário para a procedure.</param>
+        /// <returns>Um DataTable com o resultado da consulta.</returns>
         public static DataTable ExecutaProcSelectX(string nomeProc, SqlParameter parametro)
         {
             SqlParameter[] p =

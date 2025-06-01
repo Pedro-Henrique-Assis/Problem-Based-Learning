@@ -119,6 +119,18 @@ namespace ProjetoPBL.DAO
                 return MontaModel(tabela.Rows[0]);
         }
 
+
+        /// <summary>
+        /// Executa uma consulta avançada de usuários com base em vários filtros,
+        /// utilizando a stored procedure 'spConsultaAvancadaUsuarios'.
+        /// </summary>
+        /// <param name="nome">Filtro por nome de usuário.</param>
+        /// <param name="estado">Filtro por estado.</param>
+        /// <param name="sexoId">Filtro por ID de sexo.</param>
+        /// <param name="dataInicial">Filtro de data de nascimento inicial.</param>
+        /// <param name="dataFinal">Filtro de data de nascimento final.</param>
+        /// <param name="login">Filtro por login de usuário.</param>
+        /// <returns>Uma lista de UsuarioViewModel com os usuários que correspondem aos filtros.</returns>
         public List<UsuarioViewModel> ConsultaAvancadaUsuarios(string nome, string estado, int sexoId, DateTime dataInicial, DateTime dataFinal, string login)
         {
             SqlParameter[] p = {
@@ -137,142 +149,3 @@ namespace ProjetoPBL.DAO
         }
     }
 }
-
-/*
-create procedure spDelete
-(
-	@id int,
-	@tabela varchar(max)
-)
-as
-begin
-	declare @sql varchar(max)
-	set @sql = 'delete ' + @tabela +
-		' where id = ' + cast(@id as varchar(max))
-	exec(@sql)
-end
-go
-
-
-create procedure spConsulta 
-( 
-	@id int , 
-	@tabela varchar(max) 
-) 
-as 
-begin 
-	declare @sql varchar(max); 
-	set @sql = 'select * from ' + @tabela + 
-	'  where id = ' + cast(@id as varchar(max)) 
-	exec(@sql)
-end
-go
-
-create procedure spListagem 
-( 
-	@tabela varchar(max)
-)
-as 
-begin 
-	exec('select * from ' + @tabela) 
-end 
-go
-
-
-create procedure spProximoId 
-(@tabela varchar(max)) 
-as 
-begin
-	exec('select isnull(max(id) +1, 1) as MAIOR from '
-		+ @tabela)
-end 
-go
-
-
-create procedure spInsert_usuarios
-(
-	@id int,
-	@nome varchar(max),
-	@email varchar(max),
-	@data_nascimento datetime,
-	@cep varchar(max),
-	@logradouro varchar(max),
-	@numero int,
-	@cidade varchar(max),
-	@estado varchar(max),
-	@loginUsuario varchar(max),
-	@senha varchar(max),
-	@sexoId int,
-	@imagem varbinary(max),
-    @IsAdmin bit
-)
-as
-begin
-	insert into usuarios
-		(id, nome, email, data_nascimento, cep, logradouro, numero, cidade, estado, loginUsuario, senha, sexoId, imagem, IsAdmin)
-	values
-		(@id, @nome, @email, @data_nascimento, @cep, @logradouro, @numero, @cidade, @estado, @loginUsuario, @senha, @sexoId, @imagem, @IsAdmin)
-end
-go
-
-
-create procedure spUpdate_usuarios
-(
-	@id int,
-	@nome varchar(max),
-	@email varchar(max),
-	@data_nascimento datetime,
-	@cep varchar(max),
-	@logradouro varchar(max),
-	@numero int,
-	@cidade varchar(max),
-	@estado varchar(max),
-	@loginUsuario varchar(max),
-	@senha varchar(max),
-	@sexoId int,
-	@imagem varbinary(max),
-    @IsAdmin bit
-)
-as
-begin
-	update usuarios set
-		   nome = @nome,
-		   email = @email,
-		   data_nascimento = @data_nascimento,
-		   cep = @cep,
-		   logradouro = @logradouro,
-		   numero = @numero,
-		   cidade = @cidade,
-		   estado = @estado,
-		   loginUsuario = @loginUsuario,
-		   senha = @senha,
-		   sexoId = @sexoId,
-		   imagem = @imagem,
-           IsAdmin = @IsAdmin
-	where id = @id
-end
-go
-
-create procedure [dbo].[spConsultaAvancadaUsuarios] 
-( 
-	@nome varchar(max), 
-	@estado varchar(max),
-	@sexoId int,
-	@dataInicial datetime, 
-	@dataFinal datetime) 
-as 
-begin 
-	declare @categIni int 
-	declare @categFim int 
-	set @categIni = case @sexoId when 0 then 0 else @sexoId end
-	set @categFim = case @sexoId when 0 then 999999 else @sexoId end 
-	select usuarios.*, sexos.nome as 'NomeSexo' 
-	from usuarios 
-	inner join sexos on usuarios.sexoId = sexos.Id 
-	where usuarios.nome like '%' + @nome + '%' and
-	usuarios.estado like '%' + @estado + '%' and
-	usuarios.data_nascimento between @dataInicial and @dataFinal and 
-	usuarios.sexoId between @categIni and @categFim; 
-end
-go
-*/

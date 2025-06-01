@@ -15,8 +15,6 @@ namespace ProjetoPBL.DAO
 
         protected string Tabela { get; set; }
         protected string NomeSpListagem { get; set; } = "spListagem";
-
-        // NOVAS propriedades opcionais
         public string NomeSpInsert { get; set; } = "";
         public string NomeSpUpdate { get; set; } = "";
 
@@ -25,21 +23,36 @@ namespace ProjetoPBL.DAO
         protected abstract void SetTabela();
 
         /// <summary>
-        /// Executa uma stored procedure que insere
-        /// um registro no banco de dados
+        /// Insere um novo registro no banco de dados executando uma stored procedure.
+        /// O nome da procedure é definido pela propriedade 'NomeSpInsert' ou, por padrão,
+        /// construído como 'spInsert_{Tabela}'.
         /// </summary>
+        /// <param name="model">O objeto ViewModel com os dados para criar os parâmetros da procedure.</param>
         public virtual void Insert(T model)
         {
             string nomeProc = string.IsNullOrEmpty(NomeSpInsert) ? "spInsert_" + Tabela : NomeSpInsert;
             HelperDAO.ExecutaProc(nomeProc, CriaParametros(model));
         }
 
+
+        /// <summary>
+        /// Atualiza um registro existente no banco de dados executando uma stored procedure.
+        /// O nome da procedure é definido pela propriedade 'NomeSpUpdate' ou, por padrão,
+        /// construído como 'spUpdate_{Tabela}'.
+        /// </summary>
+        /// <param name="model">O objeto ViewModel com os dados para criar os parâmetros da procedure.</param>
         public virtual void Update(T model)
         {
             string nomeProc = string.IsNullOrEmpty(NomeSpUpdate) ? "spUpdate_" + Tabela : NomeSpUpdate;
             HelperDAO.ExecutaProc(nomeProc, CriaParametros(model));
         }
 
+
+        /// <summary>
+        /// Exclui um registro do banco de dados executando a stored procedure genérica 'spDelete',
+        /// passando o ID do registro e o nome da tabela como parâmetros.
+        /// </summary>
+        /// <param name="id">O ID do registro a ser excluído.</param>
         public virtual void Delete(int id)
         {
             var p = new SqlParameter[]
@@ -50,6 +63,13 @@ namespace ProjetoPBL.DAO
             HelperDAO.ExecutaProc("spDelete", p);
         }
 
+
+        /// <summary>
+        /// Consulta e retorna um registro do banco de dados pelo seu ID,
+        /// executando a stored procedure genérica 'spConsulta'.
+        /// </summary>
+        /// <param name="id">O ID do registro a ser consultado.</param>
+        /// <returns>Um objeto ViewModel do tipo T com os dados do registro, ou null se não for encontrado.</returns>
         public virtual T Consulta(int id)
         {
             var p = new SqlParameter[]
@@ -64,6 +84,11 @@ namespace ProjetoPBL.DAO
                 return MontaModel(tabela.Rows[0]);
         }
 
+
+        /// <summary>
+        /// Obtém o próximo ID disponível para uma tabela, executando a stored procedure 'spProximoId'.
+        /// </summary>
+        /// <returns>O próximo ID vago como um inteiro.</returns>
         public virtual int ProximoId()
         {
             var p = new SqlParameter[]
@@ -74,6 +99,12 @@ namespace ProjetoPBL.DAO
             return Convert.ToInt32(tabela.Rows[0][0]);
         }
 
+
+        /// <summary>
+        /// Retorna uma lista com todos os registros da tabela,
+        /// executando a stored procedure definida na propriedade 'NomeSpListagem'.
+        /// </summary>
+        /// <returns>Uma lista de objetos ViewModel do tipo T, preenchida com os dados da tabela.</returns>
         public virtual List<T> Listagem()
         {
             var p = new SqlParameter[]
@@ -89,5 +120,3 @@ namespace ProjetoPBL.DAO
         }
     }
 }
-
-//Teste Ana

@@ -147,7 +147,22 @@ namespace ProjetoPBL.Controllers
 
 
 
-
+        /// <summary>
+        /// Action para obter dados de usuários com base em filtros avançados.
+        /// Este método é chamado para popular uma grade de usuários (PartialView "pvGridUsuarios")
+        /// com base nos critérios de pesquisa fornecidos.
+        /// </summary>
+        /// <param name="nome">Nome do usuário para filtro (parcial ou completo).</param>
+        /// <param name="estado">Estado do usuário para filtro.</param>
+        /// <param name="sexoId">ID do sexo do usuário para filtro (0 para todos).</param>
+        /// <param name="dataInicial">Data inicial para filtro de data de nascimento.</param>
+        /// <param name="dataFinal">Data final para filtro de data de nascimento.</param>
+        /// <param name="login">Login do usuário para filtro (parcial ou completo).</param>
+        /// <returns>
+        /// Retorna uma PartialView ("pvGridUsuarios") com a lista de usuários filtrada
+        /// em caso de sucesso.
+        /// Retorna um Json com uma mensagem de erro em caso de exceção.
+        /// </returns>
         public IActionResult ObtemDadosConsultaAvancada(string nome, string estado, int sexoId, DateTime dataInicial, DateTime dataFinal, string login)
         {
             try
@@ -182,6 +197,19 @@ namespace ProjetoPBL.Controllers
             return View();
         }
 
+
+        /// <summary>
+        /// Action para obter e exibir a lista de chamados (tickets) para administradores.
+        /// Este método verifica se o usuário logado é um administrador. Se for,
+        /// busca todos os chamados ou os chamados pertinentes à visão de um administrador
+        /// e os exibe em uma PartialView.
+        /// </summary>
+        /// <returns>
+        /// Retorna uma PartialView ("~/Views/Chamado/pvGridChamados.cshtml") com a lista de chamados
+        /// se o usuário for um administrador.
+        /// Retorna um resultado UnauthorizedResult (HTTP 401) se o usuário não for administrador,
+        /// indicando que o acesso não é permitido.
+        /// </returns>
         public IActionResult ObtemChamados()
         {
             if (!IsUserAdmin())
