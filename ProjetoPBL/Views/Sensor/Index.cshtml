@@ -1,52 +1,63 @@
-﻿@model IEnumerable<ProjetoPBL.Models.SensorViewModel>
+﻿@model IEnumerable<SensorViewModel>
 
 @{
     ViewData["Title"] = "Listagem de Sensores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>@ViewData["Title"]</h2>
-
-@if (TempData["Mensagem"] != null)
-{
-        <div class="alert alert-success" role="alert">
-        @TempData["Mensagem"]
-        </div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/listagemSensores.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 }
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Novo Sensor</a>
-</p>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Nome</th>
-            <th>Descrição</th>
-            <th>Local</th>
-            <th>Valor de Instalação</th>
-            <th>Data de Instalação</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var sensor in Model)
+@section MainContentFullWidth {
+    <div class="tabela-sensores">
+        <h2>@ViewData["Title"]</h2>
+
+        @if (TempData["Mensagem"] != null)
         {
-                <tr>
-                    <td>@sensor.nomeSensor</td>
-                    <td>@sensor.descricaoSensor</td>
-                    <td>@sensor.localInstalacao</td>
-                    <td>@sensor.valorInstalacao.ToString("C")</td>
-                    <td>@sensor.dataInstalacao.ToString("dd/MM/yyyy")</td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@sensor.Id" class="btn btn-sm btn-primary">Editar</a>
-                        <a href="javascript:void(0);"
-                           onclick="confirmarExclusaoSensor(@sensor.Id, '@sensor.nomeSensor')"
-                           class="btn btn-sm btn-danger">Excluir</a>
-                    </td>
-                </tr>
+            <div class="alert alert-success" role="alert">
+                @TempData["Mensagem"]
+            </div>
         }
-    </tbody>
-</table>
+
+        <p>
+            <a asp-action="Create" class="btnFiltro">Novo Sensor</a>
+        </p>
+
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Local</th>
+                    <th>Valor de Instalação</th>
+                    <th>Data de Instalação</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var sensor in Model)
+                {
+                    <tr>
+                        <td>@sensor.nomeSensor</td>
+                        <td>@sensor.descricaoSensor</td>
+                        <td>@sensor.localInstalacao</td>
+                        <td>@sensor.valorInstalacao.ToString("C")</td>
+                        <td>@sensor.dataInstalacao.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@sensor.Id" class="btn btn-sm btn-primary">Editar</a>
+                            <a href="javascript:void(0);"
+                               onclick="confirmarExclusaoSensor(@sensor.Id, '@sensor.nomeSensor')"
+                               class="btn btn-sm btn-danger">Excluir</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
 
 @section Scripts {
         <!-- SweetAlert2 -->

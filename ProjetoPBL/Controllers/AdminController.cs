@@ -148,7 +148,7 @@ namespace ProjetoPBL.Controllers
 
 
 
-        public IActionResult ObtemDadosConsultaAvancada(string nome, string estado, int sexoId, DateTime dataInicial, DateTime dataFinal)
+        public IActionResult ObtemDadosConsultaAvancada(string nome, string estado, int sexoId, DateTime dataInicial, DateTime dataFinal, string login)
         {
             try
             {
@@ -165,7 +165,10 @@ namespace ProjetoPBL.Controllers
                 if (dataFinal.Date == Convert.ToDateTime("01/01/0001"))
                     dataFinal = SqlDateTime.MaxValue.Value;
 
-                var lista = dao.ConsultaAvancadaUsuarios(nome, estado, sexoId, dataInicial, dataFinal);
+                if (string.IsNullOrEmpty(login))
+                    login = "";
+
+                var lista = dao.ConsultaAvancadaUsuarios(nome, estado, sexoId, dataInicial, dataFinal, login);
                 return PartialView("pvGridUsuarios", lista);
             }
             catch (Exception erro)

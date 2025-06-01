@@ -9,16 +9,16 @@
 }
 
 @section MainContentFullWidth {
-    <fieldset id="areaFiltro" class="form-group">
+    <fieldset id="areaFiltro" class="form-group p-3 border rounded mb-4">
         <legend>@ViewData["Title"]</legend>
         <div class="row">
             <div class="col-lg-4">
                 Nome do usuário<br />
-                <input type="text" id="nome" class="form-control" />
+                <input type="text" id="nome" class="form-control" placeholder="Digite o nome"/>
             </div>
             <div class="col-lg-4">
                 Estado<br />
-                <input type="text" id="estado" class="form-control" />
+                <input type="text" id="estado" class="form-control" placeholder="Digite o estado"/>
             </div>
             <div class="col-lg-3">
                 Sexo <br />
@@ -32,6 +32,10 @@
                 <br />
                 <input type="date" id="dataFinal" class="form-control" />
             </div>
+            <div class="col-lg-4">
+                Login do usuário<br />
+                <input type="text" id="login" class="form-control" placeholder="Digite o login"/>
+            </div>
             <div class="col-lg-1">
                 <br />
                 <input type="button" id="btnFiltro" class="btnFiltro" value="Aplicar"
@@ -40,7 +44,5 @@
         </div>
     </fieldset>
 
-    <div id="resultadoConsulta" class="table-responsive">
+    <div id="resultadoConsulta" class="table-responsive"></div>
 }
-    
-</div>

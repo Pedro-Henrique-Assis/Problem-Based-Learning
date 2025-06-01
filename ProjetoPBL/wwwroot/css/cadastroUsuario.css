@@ -141,6 +141,58 @@ span[asp-validation-for="Imagem"] {
     margin-bottom: 10px;
 }
 
+.form-group-admin-status {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 5px 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border: 1px dashed #ccc;
+}
+
+    .form-group-admin-status .form-check {
+        display: flex;
+        align-items: center;
+        padding-left: 0;
+    }
+
+    .form-group-admin-status .form-check-label-admin-text {
+        margin-right: 15px;
+        margin-bottom: 0px;
+        font-weight: 500;
+        color: #333;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .form-group-admin-status .form-check-input {
+        position: static;
+        margin-left: 0;
+        margin-top: 0;
+        transform: scale(1.5);
+    }
+
+    .form-group-admin-status .form-check-label-display-only {
+        margin-left: 10px;
+        margin-bottom: 0;
+        font-weight: normal;
+    }
+
+    .form-group-admin-status .form-text.text-muted,
+    .form-group-admin-status span.text-danger {
+        font-size: 0.8em;
+        margin-top: 5px; /* Pequeno espaço acima da nota/erro */
+        padding-left: 30px; /* Alinha com o início do .form-check se necessário */
+        width: 100%;
+        white-space: nowrap;
+    }
+
+        .form-group-admin-status span.text-danger.d-block {
+            min-height: 1em; /* Evita colapso quando vazia */
+        }
+
 
 .container-externo-forms form br {
     display: none;

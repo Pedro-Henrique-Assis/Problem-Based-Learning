@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 }
 
-<body>
+@section MainContentFullWidth {
     <fieldset class="form-group p-3 border rounded mb-4">
         <legend>@ViewData["Title"]</legend>
         <div class="row g-3">
@@ -35,17 +35,13 @@
                 <input type="date" id="dataFinal" class="form-control" />
             </div>
             <div class="col-md-2 d-flex align-items-end mt-2">
-    <button type="button" class="btnFiltro w-100" style="height: 42px;" onclick="aplicaFiltroSensor()">Filtrar</button>
-</div>
-
-
+                <button type="button" class="btnFiltro w-100" style="height: 42px;" onclick="aplicaFiltroSensor()">Filtrar</button>
+            </div>
         </div>
     </fieldset>
-</body>
 
-<div id="resultadoConsulta">
-    <!-- Resultado da consulta será carregado aqui -->
-</div>
+    <div id="resultadoConsulta"></div>
+}
 
 @section Scripts {
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -4,9 +4,10 @@
     var vSexo = document.getElementById('sexoId').value
     var vDataInicial = document.getElementById('dataInicial').value;
     var vDataFinal = document.getElementById('dataFinal').value;
+    var vLogin = document.getElementById('login').value
     $.ajax({
         url: "/Admin/ObtemDadosConsultaAvancada",
-        data: { nome: vNome, estado: vEstado, sexoId: vSexo, dataInicial: vDataInicial, dataFinal: vDataFinal },
+        data: { nome: vNome, estado: vEstado, sexoId: vSexo, dataInicial: vDataInicial, dataFinal: vDataFinal, login: vLogin },
         success: function (dados) {
             if (dados.erro != undefined) {
                 alert(dados.msg);

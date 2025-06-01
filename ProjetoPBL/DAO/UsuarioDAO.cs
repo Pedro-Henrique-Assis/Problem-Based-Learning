@@ -119,7 +119,7 @@ namespace ProjetoPBL.DAO
                 return MontaModel(tabela.Rows[0]);
         }
 
-        public List<UsuarioViewModel> ConsultaAvancadaUsuarios(string nome, string estado, int sexoId, DateTime dataInicial, DateTime dataFinal)
+        public List<UsuarioViewModel> ConsultaAvancadaUsuarios(string nome, string estado, int sexoId, DateTime dataInicial, DateTime dataFinal, string login)
         {
             SqlParameter[] p = {
                 new SqlParameter("@nome", nome),
@@ -127,6 +127,7 @@ namespace ProjetoPBL.DAO
                 new SqlParameter("@sexoId", sexoId),
                 new SqlParameter("@dataInicial", dataInicial),
                 new SqlParameter("@dataFinal", dataFinal),
+                new SqlParameter("@login", login)
             };
             var tabela = HelperDAO.ExecutaProcSelect("spConsultaAvancadaUsuarios", p);
             var lista = new List<UsuarioViewModel>();

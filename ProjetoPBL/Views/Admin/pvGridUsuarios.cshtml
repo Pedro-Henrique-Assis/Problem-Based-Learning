@@ -2,13 +2,13 @@
 <table class="table table-striped" id="tabelaUsuarios">
     <tr>
         <th>Nome</th>
+        <th>Login</th>
         <th>Email</th>
         <th>Data de nascimento</th>
         <th>Sexo</th>
         <th>CEP</th>
         <th>Logradouro</th>
         <th>Número</th>
-        <th>Cidade</th>
         <th>Estado</th>
         <th>Ações</th>
     </tr>
@@ -16,13 +16,13 @@
     {
         <tr id="usuario-row-@usuario.Id">
             <td>@usuario.Nome</td>
+            <td>@usuario.LoginUsuario</td>
             <td>@usuario.Email</td>
             <td>@usuario.DataNascimento.ToShortDateString()</td>
             <td>@usuario.NomeSexo</td>
             <td>@usuario.Cep</td>
             <td>@usuario.Logradouro</td>
             <td>@usuario.Numero</td>
-            <td>@usuario.Cidade</td>
             <td>@usuario.Estado</td>
             <td>
                 <a href="/Usuario/Edit/?id=@usuario.Id" class="btn btn-light btn-sm">

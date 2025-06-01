@@ -103,6 +103,42 @@
             <span asp-validation-for="Senha"></span>
             <br />
 
+            @{
+                bool podeEditarStatusAdmin = ViewBag.UsuarioLogadoEAdmin == true && ViewBag.EditandoProprioPerfil == false;
+                bool usuarioAtualEAdmin = Model.IsAdmin; // Para preencher o checkbox no carregamento
+            }
+
+            @if (ViewBag.Operacao == "A") // Exibir apenas no modo de Edição
+            {
+                <div class="form-group form-group-admin-status">
+                    <div class="form-check">
+                        @if (podeEditarStatusAdmin)
+                        {
+                            <label class="form-check-label-admin-text" asp-for="IsAdmin">Tornar usuário administrador?</label>
+                            <input asp-for="IsAdmin" type="checkbox" class="form-check-input" />
+                        }
+                        else
+                        {
+                            // Mostra como desabilitado se não puder editar
+                            <label class="form-check-label-admin-text">Administrador:</label>
+                            <input asp-for="IsAdmin" type="checkbox" class="form-check-input" disabled="disabled" />
+                            <label class="form-check-label-display-only" asp-for="IsAdmin">
+                                @(Model.IsAdmin ? "Sim" : "Não")
+                            </label>
+                            @if (ViewBag.UsuarioLogadoEAdmin == true && ViewBag.EditandoProprioPerfil == true)
+                            {
+                                <small class="form-text text-muted d-block">Você não pode alterar seu próprio status de administrador.</small>
+                            }
+                            else if (ViewBag.UsuarioLogadoEAdmin != true) // Se o usuário logado NÃO é admin
+                            {
+                                <small class="form-text text-muted d-block">Apenas administradores podem alterar este status.</small>
+                            }
+                        }
+                    </div>
+                    <span asp-validation-for="IsAdmin" class="text-danger"></span>
+                </div>
+            }
+
             <div class="image-upload-wrapper">
                 <label for="Imagem" class="botao-upload">
                     <i class="fas fa-upload"></i> Escolha sua foto de perfil

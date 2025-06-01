@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace ProjetoPBL.Controllers
 {
@@ -112,12 +113,29 @@ namespace ProjetoPBL.Controllers
 
             if (string.IsNullOrEmpty(usuario.Nome))
                 ModelState.AddModelError("Nome", "Preencha o nome.");
+            else
+            {
+                //Expressão regular para validação extra do nome
+                var nomeRegex = new Regex(@"^[a-zA-ZÀ-ú\s']{2,200}$");
+                if (!nomeRegex.IsMatch(usuario.Nome))
+                {
+                    ModelState.AddModelError("Nome", "O Nome deve conter apenas letras, espaços e apóstrofos (')");
+                }
+                else if (usuario.Nome.Trim().Length < 2)
+                {
+                    ModelState.AddModelError("Nome", "O Nome deve ter pelo menos 2 caracteres.");
+                }
+            }
             if (!Validador.ValidaEmail(usuario.Email))
                 ModelState.AddModelError("Email", "O formato de email está incorreto. Modelo: prefixo@sufixo.com(.br)");
+
             if (usuario.DataNascimento > DateTime.Now)
                 ModelState.AddModelError("DataNascimento", "Data inválida!");
+            else if (usuario.DataNascimento == DateTime.MinValue) // Verifica se a data foi deixada vazia
+                ModelState.AddModelError("DataNascimento", "A data de nascimento é obrigatória.");
+
             if (!Validador.ValidaCep(usuario.Cep))
-                ModelState.AddModelError("Cep", "O formato do cep está incorreto. Modelo: xxxxx-xxx ou xxxxxxxx");
+            ModelState.AddModelError("Cep", "O formato do cep está incorreto. Modelo: xxxxx-xxx ou xxxxxxxx");
             if (string.IsNullOrEmpty(usuario.Logradouro))
                 ModelState.AddModelError("Logradouro", "Preencha o logradouro.");
             if (usuario.Numero <= 0)
@@ -138,14 +156,13 @@ namespace ProjetoPBL.Controllers
             if (operacao == "I" && string.IsNullOrEmpty(usuario.Senha))
                 ModelState.AddModelError("Senha", "A senha é obrigatória.");
 
-            // Processamento da Imagem e Senha
-            if (ModelState.IsValid) // Processa apenas se o restante do modelo for válido
+            if (ModelState.IsValid)
             {
-                // Se for uma alteração, precisamos buscar os dados atuais para manter
+                // Se for uma alteração, busca os dados atuais para manter
                 // a imagem e a senha, caso não sejam alteradas.
                 if (operacao == "A")
                 {
-                    // Evita consulta dupla ao banco se já tivermos os dados.
+                    // Evita consulta dupla ao banco se já tiver os dados.
                     UsuarioViewModel usuarioAtual = DAO.Consulta(usuario.Id);
                     if (usuarioAtual != null)
                     {
@@ -161,19 +178,36 @@ namespace ProjetoPBL.Controllers
                         int.TryParse(loggedInUserIdStr, out int loggedInUserId);
                         bool isAdminFieldPresentInForm = Request.Form.ContainsKey(nameof(UsuarioViewModel.IsAdmin));
 
-                        if (usuario.Id == loggedInUserId) // Usuário logado está editando o próprio perfil
+                        if (editorIsAdmin)
                         {
-                            usuario.IsAdmin = usuarioAtual.IsAdmin;
-                        }
-                        else if (editorIsAdmin) // Usuário logado é um Admin e está editando OUTRO usuário
-                        {
-                            if (!isAdminFieldPresentInForm)
+                            if (usuario.Id == loggedInUserId)
                             {
                                 usuario.IsAdmin = usuarioAtual.IsAdmin;
+
+                                if (usuarioAtual.IsAdmin && !usuario.IsAdmin && Request.Form.ContainsKey(nameof(UsuarioViewModel.IsAdmin)))
+                                {
+                                    usuario.IsAdmin = true;
+                                    ModelState.AddModelError("IsAdmin", "Você não pode remover seu próprio status de administrador."); // Opcional
+                                }
+                            }
+                            else
+                            {
+                                // Admin está editando outro usuário.
+                                if (usuarioAtual.IsAdmin && !usuario.IsAdmin)
+                                {
+                                    var todosAdmins = ((UsuarioDAO)DAO).Listagem().Where(u => u.IsAdmin).ToList();
+                                    // Se o usuário atual é o único admin na lista (ou o único que está sendo desmarcado)
+                                    if (todosAdmins.Count(a => a.Id != usuario.Id || a.IsAdmin) <= 0 && todosAdmins.Any(a => a.Id == usuario.Id))
+                                    {
+                                        ModelState.AddModelError("IsAdmin", "Não é possível remover o status de administrador do último administrador do sistema.");
+                                        usuario.IsAdmin = true;
+                                    }
+                                }
                             }
                         }
                         else
                         {
+                            // Se quem edita não é admin, o status IsAdmin não pode ser alterado.
                             usuario.IsAdmin = usuarioAtual.IsAdmin;
                         }
 
@@ -240,6 +274,14 @@ namespace ProjetoPBL.Controllers
 
             if (model == null)
                 return RedirectToAction(NomeViewIndex);
+
+            string loggedInUserIdStr = HttpContext.Session.GetString("IdUsuario");
+            int.TryParse(loggedInUserIdStr, out int loggedInUserId);
+            string loggedInUserIsAdminSessionStr = HttpContext.Session.GetString("IsAdmin");
+            bool editorLogadoEAdmin = loggedInUserIsAdminSessionStr == "True";
+
+            ViewBag.UsuarioLogadoEAdmin = editorLogadoEAdmin;
+            ViewBag.EditandoProprioPerfil = (model.Id == loggedInUserId);
 
             // Captura o parâmetro 'source' da query string
             if (Request.Query.ContainsKey("source"))
