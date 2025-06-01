@@ -1,452 +1,102 @@
-"Problem Based Learning EC5" 
+# Projeto PBL 🚀
 
-# 🧱 Configuração do Banco de Dados - Projeto PBL
-
-Este projeto utiliza SQL Server com stored procedures para manipulação de dados. Abaixo estão os scripts SQL necessários para criar o banco, as tabelas e as procedures utilizadas.
-
----
-
-## 1. Criar o Banco de Dados
-
-```sql
-CREATE DATABASE projeto_pbl;
-GO
-USE projeto_pbl;
-```
-
----
-
-## 2. Criar Tabelas
-
-### 🔹 Tabela `sexos`
-
-```sql
-CREATE TABLE sexos (
-    id INT NOT NULL PRIMARY KEY,
-    nome VARCHAR(MAX) NOT NULL
-);
-
-INSERT INTO sexos VALUES
-(1, 'Masculino'),
-(2, 'Feminino'),
-(3, 'Outro'),
-(4, 'Prefiro não informar');
-```
-
-### 🔹 Tabela `usuarios`
-
-```sql
-CREATE TABLE usuarios (
-    id INT PRIMARY KEY,
-    nome VARCHAR(100),
-    email VARCHAR(100),
-    data_nascimento DATETIME,
-    cep VARCHAR(20),
-    logradouro VARCHAR(100),
-    numero INT,
-    cidade VARCHAR(100),
-    estado VARCHAR(100),
-    loginUsuario VARCHAR(50),
-    senha VARCHAR(50),
-    sexoId INT,
-    imagem VARBINARY(MAX),
-    IsAdmin BIT NOT NULL DEFAULT 0,
-    FOREIGN KEY (sexoId) REFERENCES sexos(id)
-);
-```
-
-### 🔹 Tabela `sensor`
-
-```sql
-CREATE TABLE sensor (
-    id INT PRIMARY KEY,
-    nomeSensor VARCHAR(100) NOT NULL,
-    descricaoSensor VARCHAR(255),
-    localInstalacao VARCHAR(100),
-    valorInstalacao DECIMAL(10,2),
-    dataInstalacao DATETIME
-);
-```
-### 🔹 Tabela `Temperaturas`
-
-```sql
-CREATE TABLE Temperaturas (
-    Id INT IDENTITY(1,1) PRIMARY KEY,  
-    SensorId VARCHAR(100) NULL,         
-    RecvTime DATETIME2 NOT NULL,     
-    Temperature FLOAT NOT NULL        
-);
-```
-
-### 🔹 Tabela `Chamados`
-
-```sql
-CREATE TABLE chamados (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    titulo VARCHAR(255) NOT NULL,
-    descricao TEXT NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    data_abertura DATETIME NOT NULL,
-    usuario_id INT NOT NULL,
-    resposta TEXT NULL
-);
-```
-
----
-
-## 3. Stored Procedures Genéricas
-
-```sql
-CREATE PROCEDURE spProximoId (@tabela VARCHAR(MAX)) AS
-BEGIN
-    EXEC('SELECT ISNULL(MAX(id)+1, 1) AS MAIOR FROM ' + @tabela)
-END
-GO
-
-CREATE PROCEDURE spConsulta (@id INT, @tabela VARCHAR(MAX)) AS
-BEGIN
-    EXEC('SELECT * FROM ' + @tabela + ' WHERE id = ' + CAST(@id AS VARCHAR))
-END
-GO
-
-CREATE PROCEDURE spDelete (@id INT, @tabela VARCHAR(MAX)) AS
-BEGIN
-    EXEC('DELETE FROM ' + @tabela + ' WHERE id = ' + CAST(@id AS VARCHAR))
-END
-GO
-
-CREATE PROCEDURE spListagem (@tabela VARCHAR(MAX)) AS
-BEGIN
-    EXEC('SELECT * FROM ' + @tabela)
-END
-GO
-```
-
----
-
-## 4. Stored Procedures Específicas
-
-### 👤 `usuarios`
-
-```sql
-CREATE PROCEDURE spInsert_usuarios (
-    @id INT, @nome VARCHAR(MAX), @email VARCHAR(MAX), @data_nascimento DATETIME,
-    @cep VARCHAR(MAX), @logradouro VARCHAR(MAX), @numero INT, @cidade VARCHAR(MAX),
-    @estado VARCHAR(MAX), @loginUsuario VARCHAR(MAX), @senha VARCHAR(MAX),
-    @sexoId INT, @imagem VARBINARY(MAX), @IsAdmin BIT
-)
-AS
-BEGIN
-    INSERT INTO usuarios VALUES
-    (@id, @nome, @email, @data_nascimento, @cep, @logradouro, @numero, @cidade,
-     @estado, @loginUsuario, @senha, @sexoId, @imagem, @IsAdmin)
-END
-GO
-
-CREATE PROCEDURE spUpdate_usuarios (
-    @id INT, @nome VARCHAR(MAX), @email VARCHAR(MAX), @data_nascimento DATETIME,
-    @cep VARCHAR(MAX), @logradouro VARCHAR(MAX), @numero INT, @cidade VARCHAR(MAX),
-    @estado VARCHAR(MAX), @loginUsuario VARCHAR(MAX), @senha VARCHAR(MAX),
-    @sexoId INT, @imagem VARBINARY(MAX), @IsAdmin BIT
-)
-AS
-BEGIN
-    UPDATE usuarios SET
-        nome = @nome,
-        email = @email,
-        data_nascimento = @data_nascimento,
-        cep = @cep,
-        logradouro = @logradouro,
-        numero = @numero,
-        cidade = @cidade,
-        estado = @estado,
-        loginUsuario = @loginUsuario,
-        senha = @senha,
-        sexoId = @sexoId,
-        imagem = @imagem,
-        IsAdmin = @IsAdmin
-    WHERE id = @id
-END
-GO
-
-CREATE PROCEDURE spConsultaAvancadaUsuarios
-( 
-	@nome varchar(max), 
-	@estado varchar(max),
-	@sexoId int,
-	@dataInicial datetime, 
-	@dataFinal datetime,
-	@login varchar(max)
-) 
-AS 
-BEGIN 
-	DECLARE @categIni INT 
-	DECLARE @categFim INT 
-	SET @categIni = CASE @sexoId WHEN 0 THEN 0 ELSE @sexoId END
-	SET @categFim = CASE @sexoId WHEN 0 THEN 999999 ELSE @sexoId END 
-	SELECT usuarios.*, sexos.nome AS 'NomeSexo' 
-	FROM usuarios 
-	INNER JOIN sexos ON usuarios.sexoId = sexos.Id 
-	WHERE usuarios.nome LIKE '%' + @nome + '%' AND
-	usuarios.loginUsuario LIKE '%' + @login + '%' AND
-	usuarios.estado LIKE '%' + @estado + '%' AND
-	usuarios.data_nascimento BETWEEN @dataInicial AND @dataFinal AND 
-	usuarios.sexoId BETWEEN @categIni AND @categFim; 
-END
-GO
-```
-
-### 🌡️ `sensor`
-
-```sql
--- Verifica se já existe um sensor com o mesmo nome
-CREATE PROCEDURE sp_verificar_sensor (
-    @nomeSensor VARCHAR(100)
-)
-AS
-BEGIN
-    SELECT COUNT(*) AS cont
-    FROM sensor
-    WHERE nomeSensor = @nomeSensor;
-END
-GO
-
--- Insere um novo sensor
-CREATE PROCEDURE spInsert_sensor (
-    @id INT,
-    @nomeSensor VARCHAR(100),
-    @descricaoSensor VARCHAR(255),
-    @localInstalacao VARCHAR(100),
-    @valorInstalacao DECIMAL(10,2),
-    @dataInstalacao DATETIME
-)
-AS
-BEGIN
-    INSERT INTO sensor (
-        id,
-        nomeSensor,
-        descricaoSensor,
-        localInstalacao,
-        valorInstalacao,
-        dataInstalacao
-    )
-    VALUES (
-        @id,
-        @nomeSensor,
-        @descricaoSensor,
-        @localInstalacao,
-        @valorInstalacao,
-        @dataInstalacao
-    );
-END
-GO
-
--- Atualiza um sensor existente
-CREATE PROCEDURE spUpdate_sensor (
-    @id INT,
-    @nomeSensor VARCHAR(100),
-    @descricaoSensor VARCHAR(255),
-    @localInstalacao VARCHAR(100),
-    @valorInstalacao DECIMAL(10,2),
-    @dataInstalacao DATETIME
-)
-AS
-BEGIN
-    UPDATE sensor
-    SET
-        nomeSensor = @nomeSensor,
-        descricaoSensor = @descricaoSensor,
-        localInstalacao = @localInstalacao,
-        valorInstalacao = @valorInstalacao,
-        dataInstalacao = @dataInstalacao
-    WHERE id = @id;
-END
-GO
-
---Consulta avançada de Sensor 
-
-CREATE PROCEDURE spConsultaAvancadaSensores
-    @local VARCHAR(100) = NULL,
-    @valorMin DECIMAL(10,2) = NULL,
-    @valorMax DECIMAL(10,2) = NULL,
-    @dataInicial DATETIME = NULL,
-    @dataFinal DATETIME = NULL
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    SELECT *
-    FROM sensor
-    WHERE (@local IS NULL OR localInstalacao LIKE '%' + @local + '%')
-      AND (@valorMin IS NULL OR valorInstalacao >= @valorMin)
-      AND (@valorMax IS NULL OR valorInstalacao <= @valorMax)
-      AND (@dataInicial IS NULL OR dataInstalacao >= @dataInicial)
-      AND (@dataFinal IS NULL OR dataInstalacao <= @dataFinal)
-END
-GO
-```
-
-### 🌡️ `temperatura`
-
-```sql
--- Verifica se já existe um registro
-CREATE PROCEDURE spExisteRegistro
-    @SensorId NVARCHAR(100),
-    @RecvTime DATETIME,
-    @Temperature FLOAT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    SELECT COUNT(1) AS RegistroExiste
-    FROM Temperaturas
-    WHERE SensorId = @SensorId
-      AND RecvTime = @RecvTime
-      AND Temperature = @Temperature;
-END
-GO
-
--- Insere um novo registro de temperatura na tabela Temperaturas
-CREATE PROCEDURE spInserirTemperatura
-    @SensorId NVARCHAR(100),
-    @RecvTime DATETIME,
-    @Temperature FLOAT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    INSERT INTO Temperaturas (SensorId, RecvTime, Temperature)
-    VALUES (@SensorId, @RecvTime, @Temperature);
-END
-GO
-
--- Lista todos os registros da tabela Temperaturas
-CREATE PROCEDURE spListarTemperaturas
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    SELECT SensorId, RecvTime, Temperature
-    FROM Temperaturas
-    ORDER BY RecvTime ASC;
-END
-GO
-
-```
-### 📞 `Chamados`
-
-```sql
--- Consulta chamado por ID
-CREATE PROCEDURE spConsultaChamadoPorId
-    @id INT
-AS
-BEGIN
-    SELECT * FROM chamados WHERE id = @id;
-END
-GO
-
--- Consulta os chamados
-USE projeto_pbl
-GO
-
-CREATE PROCEDURE spConsultaChamados
-    @usuario_id INT,
-    @is_admin BIT
-AS
-BEGIN
-    IF @is_admin = 1
-    BEGIN
-        SELECT *
-        FROM chamados
-        ORDER BY data_abertura DESC;
-    END
-    ELSE
-    BEGIN
-        SELECT *
-        FROM chamados
-        WHERE usuario_id = @usuario_id
-        ORDER BY data_abertura DESC;
-    END
-END
-GO
-
--- Deleta Chamado
-USE projeto_pbl
-GO
-
-CREATE PROCEDURE spDeleteChamados
-    @id INT
-AS
-BEGIN
-    DELETE FROM chamados WHERE id = @id;
-END
-GO
+Este projeto foi desenvolvido como parte do Projeto Baseado em Problemas (PBL) do curso de Engenharia da Computação, com foco em aplicações IoT, coleta e análise de dados e construção de sistemas robustos em ASP.NET Core 3.1 com SQL Server.
 
 
--- Insere novo chamado
-CREATE PROCEDURE spInsertChamados
-    @titulo VARCHAR(255),
-    @descricao TEXT,
-    @status VARCHAR(50),
-    @data_abertura DATETIME,
-    @usuario_id INT,
-    @resposta TEXT = NULL
-AS
-BEGIN
-    INSERT INTO chamados (titulo, descricao, status, data_abertura, usuario_id, resposta)
-    VALUES (@titulo, @descricao, @status, @data_abertura, @usuario_id, @resposta);
-END
-GO
+## 📝 Descrição Geral
 
--- Lista todos os chamados
-CREATE PROCEDURE spListagemChamados
-AS
-BEGIN
-    SELECT * FROM chamados ORDER BY data_abertura DESC;
-END
-GO
+O ProjetoPBL é uma aplicação web que permite o cadastro, edição, exclusão e consulta de sensores, além da integração com a plataforma FIWARE para o gerenciamento de sensores de temperatura. O sistema realiza validações, autenticação de usuários, coleta automática de dados, exibição em dashboards e operações CRUD com SQL Server.
 
--- Responder Chamado
+## ✅ Funcionalidades
 
-USE projeto_pbl
-GO
+- 🧾 Cadastro, edição e exclusão de sensores  
+- ✔️ Validação de dados (nome, descrição, local, valor, data de instalação)  
+- 🔄 Integração com a API do FIWARE para criação, leitura e exclusão de sensores  
+- 🌡️ Coleta automática de temperaturas  
+- 🔐 Autenticação de usuários com sessões  
+- 📊 Dashboard de temperaturas em tempo real  
+- 📈 Regressão linear entre temperatura e voltagem  
+- 🔎 Consulta avançada de sensores e usuários  
+- 🛠️ Gerenciamento e resposta de chamados  
+- 🛡️ Proteção de rotas com base em permissões de administrador  
 
-CREATE PROCEDURE spResponderChamado
-    @id INT,
-    @resposta TEXT,
-    @status VARCHAR(50)
-AS
-BEGIN
-    UPDATE chamados
-    SET resposta = @resposta,
-        status = @status
-    WHERE id = @id;
-END
-GO
+## 🧰 Tecnologias Utilizadas
 
--- Atualiza chamado
-USE projeto_pbl
-GO
+- 🖥️ ASP.NET Core 3.1 (MVC)  
+- 💻 C#  
+- 🗃️ SQL Server com Stored Procedures  
+- 🌐 JavaScript / jQuery / AJAX  
+- 📉 Chart.js  
+- 🌍 FIWARE (NGSI, IoT Agent, Orion Context Broker, STH Comet)   
 
-CREATE PROCEDURE spUpdateChamados
-    @id INT,
-    @titulo VARCHAR(255),
-    @descricao TEXT,
-    @status VARCHAR(50),
-    @data_abertura DATETIME,
-    @usuario_id INT,
-    @resposta TEXT = NULL
-AS
-BEGIN
-    UPDATE chamados
-    SET titulo = @titulo,
-        descricao = @descricao,
-        status = @status,
-        data_abertura = @data_abertura,
-        usuario_id = @usuario_id,
-        resposta = @resposta
-    WHERE id = @id;
-END
-GO
+## 🔗 Integração com FIWARE
 
-```
+A integração do sistema com a plataforma FIWARE permite a comunicação com sensores IoT para obtenção e armazenamento de dados de temperatura em tempo real. A aplicação consome dados por meio da API STH-Comet utilizando requisições HTTP, realizando o tratamento e inserção das informações no banco de dados apenas se ainda não existirem, garantindo eficiência e integridade.
+
+A URL utilizada para leitura é:  
+`http://<ip_fiware>:8666/STH/v1/contextEntities/type/Temperature/id/urn:ngsi-ld:Temperature:001/attributes/temperature?lastN=100`
+
+As requisições são autenticadas com os seguintes cabeçalhos obrigatórios:  
+`Fiware-Service: smart`  
+`Fiware-ServicePath: /`
+
+Além disso, o sistema realiza automaticamente a coleta desses dados por meio de agendamentos ou chamadas diretas ao método responsável no controlador de temperatura, mantendo os dashboards sempre atualizados.
+
+## 🔒 Segurança e Sessões
+
+- Os usuários são autenticados via login e senha  
+- A sessão guarda `Logado`, `IdUsuario`, `NomeUsuario` e `IsAdmin`  
+- As áreas administrativas só podem ser acessadas por usuários com `IsAdmin = true`  
+- A exclusão de usuários está protegida para não permitir apagar o último administrador nem o próprio usuário  
+
+## 📈 Dashboards
+
+### Dashboard de Temperaturas
+
+- 📉 Exibe gráfico de linha com temperaturas em tempo real  
+- 🔄 Atualização automática a cada 5 segundos com dados do endpoint `/Temperatura/Listar`  
+
+### Dashboard com Regressão Linear
+
+- 📊 Mostra a relação entre voltagem e temperatura  
+- 🧮 Inclui tabela de medições, cálculos ponderados, resíduos e coeficientes da regressão linear  
+- 📐 Representação gráfica com scatter plot e linha de regressão calculada com base em fórmulas estatísticas  
+
+## 🔍 Consultas Avançadas
+
+- **Usuários**: Filtro por nome, estado, sexo, datas e login  
+- **Sensores**: Filtro por local, valores mínimo/máximo e datas  
+
+## 🆘 Chamados
+
+- 📩 Chamados podem ser abertos por usuários autenticados  
+- 📝 Chamados têm título, descrição, status, data de abertura, usuário e resposta  
+- 🛡️ A administração pode listar, responder, atualizar ou excluir chamados  
+- 👤 Os chamados são protegidos por controle de permissões e podem ser listados por usuário ou por todos  
+
+## ⚙️ Requisitos para Execução
+
+1. 📦 .NET Core SDK 3.1  
+2. 🛢️ SQL Server local ou remoto  
+3. ☁️ Instância do FIWARE (IoT Agent + Orion + STH)  
+
+## 🛠️ Configuração do Banco de Dados
+
+- Banco: `projeto_pbl`  
+- Tabelas: `usuarios`, `sexos`, `sensores`, `temperaturas`, `chamados`  
+- Procedures:  
+  - `spInsert_*`  
+  - `spUpdate_*`  
+  - `spDelete_*`  
+  - `spConsultaAvancadaUsuarios`  
+  - `spExisteRegistro`  
+  - `spInserirTemperatura`  
+  - `spListarTemperaturas`  
+  - `spResponderChamado`  
+  - `spConsultaChamados`  
+
+## 🎓 Considerações Finais
+
+A aplicação reflete os desafios de um cenário real, simulando um sistema de monitoramento remoto de temperatura em estufas, com coleta de dados confiável, visualização em tempo real, análise estatística e gerenciamento administrativo seguro.
+
+
