@@ -1,12 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ProjetoPBL.Services;
+using ProjetoPBL.Controllers;
 
 namespace ProjetoPBL
 {
@@ -19,7 +18,7 @@ namespace ProjetoPBL
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        // Registra os serviços
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
@@ -28,12 +27,16 @@ namespace ProjetoPBL
 
             services.AddSession(options =>
             {
-                options.Cookie.IsEssential = true; // GDPR mais detalhes em https://andrewlock.net/session-state-gdpr-and-non-essential-cookies/ 
+                options.Cookie.IsEssential = true;
                 options.IdleTimeout = TimeSpan.FromSeconds(600000);
             });
+
+            // 🔹 Adiciona o serviço de coleta automática
+            services.AddSingleton<TemperaturaController>();         // Necessário para injeção
+            services.AddHostedService<ColetorTemperaturaService>(); // Executa em background
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        // Configura o pipeline HTTP
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -44,12 +47,10 @@ namespace ProjetoPBL
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
             app.UseStaticFiles();
-
             app.UseSession();
-
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

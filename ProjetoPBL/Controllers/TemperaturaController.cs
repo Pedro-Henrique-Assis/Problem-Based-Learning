@@ -16,8 +16,10 @@ namespace ProjetoPBL.Controllers
         private readonly string fiwareUrl = "http://54.225.206.198:8666/STH/v1/contextEntities/type/Temperature/id/urn:ngsi-ld:Temperature:001/attributes/temperature?lastN=100";
 
         // Método para coleta e inserção no banco (usado por job ou agendador)
+        [HttpGet]
         public async Task<IActionResult> ColetarSalvar()
         {
+            Console.WriteLine(">> Entrou no método ColetarSalvar");
             var dados = await BuscarTemperaturasFIWARE();
 
             if (dados != null && dados.Any())
@@ -36,6 +38,7 @@ namespace ProjetoPBL.Controllers
 
             return BadRequest("Erro ao coletar temperaturas.");
         }
+
 
         // Retorna todos os dados do banco de forma JSON
         public IActionResult Listar()
