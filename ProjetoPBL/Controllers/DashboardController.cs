@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using ProjetoPBL.DAO;
 using ProjetoPBL.Models;
 using System;
 using System.Collections.Generic;
@@ -8,11 +9,34 @@ namespace ProjetoPBL.Controllers
 {
     public class DashboardController : Controller
     {
-        public IActionResult Dashboard1()
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            return View("Dashboard1");
+            if (!HelperControllers.VerificaUserLogado(HttpContext.Session))
+                context.Result = RedirectToAction("Index", "Login");
+            else
+            {
+                ViewBag.Logado = true;
+                base.OnActionExecuting(context);
+            }
         }
 
+        // 🔹 Dashboard com ponto de τ baseado no valor mais próximo de 63,2%
+        public IActionResult Dashboard1()
+        {
+            var dao = new TemperaturaDAO();
+            List<TemperaturaViewModel> dados = dao.Listar();
+
+            var (ganhoK, tau, tempoReal, alvo632) = dao.CalcularParametros();
+            ViewBag.GanhoK = ganhoK;
+            ViewBag.ConstanteTau = tau;
+            ViewBag.RecvTimeTau = tempoReal?.ToString("HH:mm");
+            ViewBag.Alvo632 = alvo632;
+
+
+            return View("Dashboard1", dados);
+        }
+
+        // 🔹 Dashboard com regressão linear
         public IActionResult Dashboard2()
         {
             var dados = new List<RegressaoViewModel>
@@ -33,17 +57,5 @@ namespace ProjetoPBL.Controllers
 
             return View("Dashboard2", dados);
         }
-
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            if (!HelperControllers.VerificaUserLogado(HttpContext.Session))
-                context.Result = RedirectToAction("Index", "Login");
-            else
-            {
-                ViewBag.Logado = true;
-                base.OnActionExecuting(context);
-            }
-        }
     }
 }
-

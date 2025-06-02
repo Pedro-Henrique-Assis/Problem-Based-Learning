@@ -13,10 +13,9 @@ namespace ProjetoPBL.Controllers
     public class TemperaturaController : Controller
     {
         private readonly TemperaturaDAO dao = new TemperaturaDAO();
-
         private readonly string fiwareUrl = "http://54.225.206.198:8666/STH/v1/contextEntities/type/Temperature/id/urn:ngsi-ld:Temperature:001/attributes/temperature?lastN=100";
 
-        // Método público para ser chamado (ex: por Hangfire) para coletar e salvar dados
+        // Método para coleta e inserção no banco (usado por job ou agendador)
         public async Task<IActionResult> ColetarSalvar()
         {
             var dados = await BuscarTemperaturasFIWARE();
@@ -31,15 +30,36 @@ namespace ProjetoPBL.Controllers
                         RecvTime = temp.recvTime,
                         Temperature = temp.attrValue
                     });
-
                 }
                 return Ok($"Temperaturas salvas: {dados.Count}");
             }
+
             return BadRequest("Erro ao coletar temperaturas.");
         }
 
+        // Retorna todos os dados do banco de forma JSON
+        public IActionResult Listar()
+        {
+            var lista = dao.Listar();
+            return Json(lista);
+        }
 
-        // Consome a API FIWARE STH e retorna lista de valores
+        // ✅ Endpoint atualizado com os 4 valores retornados
+        [HttpGet]
+        public IActionResult ObterParametros()
+        {
+            var (ganhoK, tau, tempoReal, alvo632) = dao.CalcularParametros();
+
+            return Json(new
+            {
+                ganhoK = ganhoK,
+                constanteTau = tau,
+                recvTimeTau = tempoReal?.ToString("HH:mm"),
+                alvo632 = alvo632
+            });
+        }
+
+        // 🔽 FIWARE JSON Parsing 🔽
         private async Task<List<Value>> BuscarTemperaturasFIWARE()
         {
             using var client = new HttpClient();
@@ -61,15 +81,12 @@ namespace ProjetoPBL.Controllers
             var sthResponse = JsonSerializer.Deserialize<StHResponse>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             var values = sthResponse?.contextResponses?.FirstOrDefault()?
-                            .contextElement?.attributes?.FirstOrDefault()?
-                            .values;
+                .contextElement?.attributes?.FirstOrDefault()?.values;
 
             return values;
         }
 
-
-
-        // Classes para desserializar o JSON do STH
+        // Classes auxiliares para desserializar a estrutura FIWARE
         private class StHResponse
         {
             public List<ContextResponse> contextResponses { get; set; }
@@ -97,13 +114,6 @@ namespace ProjetoPBL.Controllers
         {
             public DateTime recvTime { get; set; }
             public float attrValue { get; set; }
-        }
-
-        // Método para listar os dados do banco (exemplo para o frontend consumir)
-        public IActionResult Listar()
-        {
-            var lista = dao.Listar();
-            return Json(lista);
         }
     }
 }

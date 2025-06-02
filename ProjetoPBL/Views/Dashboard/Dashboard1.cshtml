@@ -1,124 +1,221 @@
-﻿@{
+﻿@model List<ProjetoPBL.Models.TemperaturaViewModel>
+
+@{
     ViewData["Title"] = "Dashboard de Temperaturas";
+    var ganhoK = Convert.ToDouble(ViewBag.GanhoK ?? 0);
+    var constanteTau = Convert.ToDouble(ViewBag.ConstanteTau ?? 0);
+    var alvo632 = Convert.ToDouble(ViewBag.Alvo632 ?? 0);
 }
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="container-dashboard">
+    <div style="margin-bottom: 20px;">
+        <p><strong>Temperatura Atual:</strong> <span id="tempAtual">-</span> °C</p>
+        <p><strong>Ganho Estático (K):</strong> <span id="ganhoK">@ganhoK.ToString("F2")</span> °C</p>
+        <p><strong>Constante de Tempo (τ):</strong> <span id="tau">@constanteTau.ToString("F2")</span> s</p>
+        <p><strong>Valor de 63,2% de K:</strong> <span id="alvo632">@alvo632.ToString("F2")</span> °C</p>
+    </div>
+
+    <canvas id="chartTemperaturas" width="800" height="400"></canvas>
+</div>
 
 @section Styles {
     <link rel="stylesheet" href="~/css/dashboard1.css" />
 }
 
-<h2>@ViewData["Title"]</h2>
-
-<canvas id="chartTemperaturas" width="800" height="400"></canvas>
-
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0"></script>
 
     <script>
-        const ctx = document.getElementById('chartTemperaturas').getContext('2d');
         let chart;
+        let ctx;
+
+        async function buscarParametros() {
+            try {
+                const response = await fetch('/Temperatura/ObterParametros');
+                const json = await response.json();
+
+                return {
+                    ganhoK: parseFloat(json.ganhoK),
+                    constanteTau: parseFloat(json.constanteTau),
+                    tempoTauLabel: json.recvTimeTau
+                };
+            } catch (error) {
+                console.error("Erro ao obter parâmetros:", error);
+                return null;
+            }
+        }
 
         async function fetchData() {
             try {
-                const response = await fetch('/Temperatura/Listar');
-                const data = await response.json();
+                const [parametros, tempResponse] = await Promise.all([
+                    buscarParametros(),
+                    fetch('/Temperatura/Listar')
+                ]);
 
+                if (!parametros) return;
+
+                const ganhoK = parametros.ganhoK;
+                const constanteTau = parametros.constanteTau;
+                const tempoTauLabel = parametros.tempoTauLabel;
+                const alvo632 = parseFloat(document.getElementById('alvo632').innerText.replace(',', '.'));
+
+                document.getElementById('ganhoK').innerText = ganhoK.toFixed(2);
+                document.getElementById('tau').innerText = constanteTau.toFixed(2);
+                document.getElementById('alvo632').innerText = alvo632.toFixed(2);
+
+                const data = await tempResponse.json();
                 const labels = data.map(d => new Date(d.recvTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
                 const temperatures = data.map(d => d.temperature);
 
-                if (chart) {
-                    chart.data.labels = labels;
-                    chart.data.datasets[0].data = temperatures;
-                    chart.update();
+                const tempAtual = temperatures.at(-1);
+                const elTemp = document.getElementById('tempAtual');
+                elTemp.innerText = tempAtual.toFixed(2);
+
+                if (tempAtual >= 35) {
+                    elTemp.classList.add("piscando");
                 } else {
-                    chart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Temperatura (°C)',
-                                data: temperatures,
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                backgroundColor: 'rgba(75, 192, 192, 0.3)',
-                                fill: true,
-                                tension: 0.4,
-                                pointRadius: 0,
-                                pointHoverRadius: 6,
-                                borderWidth: 3
-                            }]
+                    elTemp.classList.remove("piscando");
+                }
+
+                const indexTau = temperatures.findIndex(t => Math.abs(t - alvo632) < 0.2);
+                const pointTau = (indexTau !== -1) ? [{ x: labels[indexTau], y: temperatures[indexTau] }] : [];
+
+                const datasets = [
+                    {
+                        label: 'Temperatura (°C)',
+                        data: temperatures,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.3)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        borderWidth: 3
+                    },
+                    {
+                        label: 'τ (63,2%)',
+                        data: pointTau,
+                        type: 'scatter',
+                        pointBackgroundColor: 'red',
+                        pointBorderColor: 'red',
+                        pointRadius: 6,
+                        pointStyle: 'circle',
+                        showLine: false
+                    }
+                ];
+
+                const config = {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        interaction: {
+                            mode: 'nearest',
+                            intersect: false
                         },
-                        options: {
-                            responsive: true,
-                            interaction: {
-                                mode: 'nearest',
-                                intersect: false
-                            },
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top',
-                                    labels: {
-                                        font: {
-                                            size: 14,
-                                            weight: 'bold'
-                                        },
-                                        color: '#333'
-                                    }
-                                },
-                                tooltip: {
-                                    enabled: true,
-                                    backgroundColor: 'rgba(0,0,0,0.7)',
-                                    titleFont: { size: 16, weight: 'bold' },
-                                    bodyFont: { size: 14 }
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: { size: 14, weight: 'bold' },
+                                    color: '#333'
                                 }
                             },
-                            scales: {
-                                x: {
-                                    display: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Hora',
-                                        font: {
-                                            size: 14,
-                                            weight: 'bold'
-                                        },
-                                        color: '#666'
-                                    },
-                                    grid: { display: false },
-                                    ticks: {
-                                        maxRotation: 45,
-                                        minRotation: 45,
-                                        maxTicksLimit: 12
+                            tooltip: {
+                                enabled: true,
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                titleFont: { size: 16, weight: 'bold' },
+                                bodyFont: { size: 14 }
+                            },
+                            annotation: {
+                                annotations: {
+                                    linhaSetPoint: {
+                                        type: 'line',
+                                        yMin: 35,
+                                        yMax: 35,
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 2,
+                                        borderDash: [6, 6],
+                                        label: {
+                                            content: 'Set Point (35 °C)',
+                                            enabled: true,
+                                            position: 'end',
+                                            backgroundColor: 'rgba(255, 99, 132, 0.8)',
+                                            font: {
+                                                weight: 'bold',
+                                                size: 12
+                                            }
+                                        }
                                     }
-                                },
-                                y: {
-                                    display: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Temperatura (°C)',
-                                        font: {
-                                            size: 14,
-                                            weight: 'bold'
-                                        },
-                                        color: '#666'
-                                    },
-                                    grid: {
-                                        color: 'rgba(200,200,200,0.2)',
-                                        borderDash: [5, 5]
-                                    },
-                                    beginAtZero: false,
-                                    suggestedMin: Math.min(...temperatures) - 2,
-                                    suggestedMax: Math.max(...temperatures) + 2
                                 }
                             }
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Hora',
+                                    font: { size: 14, weight: 'bold' },
+                                    color: '#666'
+                                },
+                                grid: { display: false },
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    maxTicksLimit: 12
+                                }
+                            },
+                            y: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Temperatura (°C)',
+                                    font: { size: 14, weight: 'bold' },
+                                    color: '#666'
+                                },
+                                grid: {
+                                    color: 'rgba(200,200,200,0.2)',
+                                    borderDash: [5, 5]
+                                },
+                                beginAtZero: false,
+                                suggestedMin: Math.min(...temperatures) - 2,
+                                suggestedMax: Math.max(...temperatures) + 2
+                            }
                         }
-                    });
+                    }
+                };
+
+                if (!chart) {
+                    chart = new Chart(ctx, config);
+                } else {
+                    chart.data.labels = labels;
+                    chart.data.datasets = datasets;
+                    chart.update();
                 }
+
             } catch (error) {
                 console.error('Erro ao buscar dados:', error);
             }
         }
 
-        fetchData();
-        setInterval(fetchData, 5000); // Atualiza a cada 5 segundos
+        window.onload = function () {
+            const canvas = document.getElementById('chartTemperaturas');
+            if (!canvas) {
+                console.error("Canvas #chartTemperaturas não encontrado.");
+                return;
+            }
+
+            ctx = canvas.getContext('2d');
+            fetchData();
+            setInterval(fetchData, 5000);
+        };
     </script>
 }

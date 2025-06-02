@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using Dapper;
+using System.Linq;
 
 namespace ProjetoPBL.DAO
 {
@@ -47,5 +48,35 @@ namespace ProjetoPBL.DAO
             using var conexao = new SqlConnection(connectionString);
             return conexao.Query<TemperaturaViewModel>("spListarTemperaturas", commandType: CommandType.StoredProcedure).AsList();
         }
+
+        public (float ganhoK, double constanteTempoTau, DateTime? tempoRealTau, float alvo632) CalcularParametros()
+        {
+            var dados = Listar();
+
+            if (dados == null || dados.Count < 2)
+                return (0, 0, null, 0);
+
+            var dadosOrdenados = dados.OrderBy(t => t.RecvTime).ToList();
+
+            float tempInicial = dadosOrdenados.First().Temperature;
+            var ultimos = dadosOrdenados.TakeLast(10).Select(d => d.Temperature);
+            float tempFinal = ultimos.Average();
+
+            float ganhoK = tempFinal - tempInicial;
+            float alvo = tempInicial + 0.632f * ganhoK;
+            DateTime tempoInicial = dadosOrdenados.First().RecvTime;
+
+            foreach (var ponto in dadosOrdenados)
+            {
+                if (ponto.Temperature >= alvo)
+                {
+                    double tempoTau = (ponto.RecvTime - tempoInicial).TotalSeconds;
+                    return (ganhoK, tempoTau, ponto.RecvTime, alvo);
+                }
+            }
+
+            return (ganhoK, 0, null, alvo);
+        }
+
     }
 }
