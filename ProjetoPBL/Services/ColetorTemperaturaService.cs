@@ -27,7 +27,7 @@ namespace ProjetoPBL.Services
                     await controller.ColetarSalvar(); // chama o método
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // executa a cada 1 minuto
+                await Task.Delay(TimeSpan.FromSeconds(3), stoppingToken); // executa a cada 1 minuto
             }
         }
     }
