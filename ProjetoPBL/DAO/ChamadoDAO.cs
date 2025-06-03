@@ -6,8 +6,10 @@ using ProjetoPBL.Models;
 
 namespace ProjetoPBL.DAO
 {
+    // DAO específico para operações CRUD e consultas da entidade Chamado
     public class ChamadoDAO : PadraoDAO<ChamadoViewModel>
     {
+        // Define as configurações básicas do DAO: tabela e nomes das stored procedures usadas
         protected override void SetTabela()
         {
             Tabela = "chamados";
@@ -16,6 +18,7 @@ namespace ProjetoPBL.DAO
             NomeSpUpdate = "dbo.spUpdateChamados";
         }
 
+        // Cria os parâmetros SQL para inserção/atualização a partir do model recebido
         protected override SqlParameter[] CriaParametros(ChamadoViewModel model)
         {
             return new SqlParameter[]
@@ -26,10 +29,12 @@ namespace ProjetoPBL.DAO
                 new SqlParameter("@status", model.Status),
                 new SqlParameter("@data_abertura", model.DataAbertura),
                 new SqlParameter("@usuario_id", model.UsuarioId),
+                // Se resposta for null, envia DBNull para o parâmetro SQL
                 new SqlParameter("@resposta", (object)model.Resposta ?? DBNull.Value)
             };
         }
 
+        // Monta um objeto ChamadoViewModel a partir de uma linha do DataTable
         protected override ChamadoViewModel MontaModel(DataRow registro)
         {
             return new ChamadoViewModel
@@ -44,7 +49,12 @@ namespace ProjetoPBL.DAO
             };
         }
 
-        // NOVO MÉTODO: usa a stored procedure spConsultaChamados com permissões
+        /// <summary>
+        /// Consulta chamados aplicando permissões, usando stored procedure que considera se o usuário é admin
+        /// </summary>
+        /// <param name="usuarioId">ID do usuário logado</param>
+        /// <param name="isAdmin">Flag que indica se o usuário é admin</param>
+        /// <returns>Lista de chamados filtrada conforme permissão</returns>
         public List<ChamadoViewModel> ConsultaChamadosPorPermissao(int usuarioId, bool isAdmin)
         {
             var parametros = new SqlParameter[]
@@ -62,7 +72,10 @@ namespace ProjetoPBL.DAO
             return lista;
         }
 
-        // Listar todos os chamados (usando spListagemChamados)
+        /// <summary>
+        /// Lista todos os chamados usando a stored procedure padrão de listagem
+        /// </summary>
+        /// <returns>Lista completa de chamados</returns>
         public override List<ChamadoViewModel> Listagem()
         {
             var tabela = HelperDAO.ExecutaProcSelect(NomeSpListagem, null);
@@ -72,7 +85,11 @@ namespace ProjetoPBL.DAO
             return lista;
         }
 
-        // Consulta por ID individual (não usa a nova SP)
+        /// <summary>
+        /// Consulta um chamado pelo seu ID
+        /// </summary>
+        /// <param name="id">ID do chamado</param>
+        /// <returns>Objeto ChamadoViewModel ou null se não encontrado</returns>
         public override ChamadoViewModel Consulta(int id)
         {
             var p = new SqlParameter[] { new SqlParameter("@id", id) };
@@ -83,7 +100,11 @@ namespace ProjetoPBL.DAO
                 return MontaModel(tabela.Rows[0]);
         }
 
-        // Insert que retorna o ID do chamado criado
+        /// <summary>
+        /// Insere um novo chamado e retorna o ID gerado
+        /// </summary>
+        /// <param name="model">Dados do chamado a inserir</param>
+        /// <returns>ID do chamado recém-criado</returns>
         public int InsertRetornandoId(ChamadoViewModel model)
         {
             using (var conexao = ConexaoBD.GetConexao())
@@ -99,18 +120,21 @@ namespace ProjetoPBL.DAO
                     comando.Parameters.AddWithValue("@usuario_id", model.UsuarioId);
                     comando.Parameters.AddWithValue("@resposta", (object)model.Resposta ?? DBNull.Value);
 
+                    // ExecuteScalar retorna o primeiro valor da primeira linha, usado aqui para pegar o ID
                     var novoId = Convert.ToInt32(comando.ExecuteScalar());
                     return novoId;
                 }
             }
         }
 
-        // Update
+        /// <summary>
+        /// Atualiza os dados de um chamado existente
+        /// </summary>
+        /// <param name="model">Objeto com os dados atualizados</param>
         public override void Update(ChamadoViewModel model)
         {
             using (var conexao = ConexaoBD.GetConexao())
             {
-                
                 using (var comando = new SqlCommand("dbo.spUpdateChamados", conexao))
                 {
                     comando.CommandType = CommandType.StoredProcedure;
@@ -128,12 +152,14 @@ namespace ProjetoPBL.DAO
             }
         }
 
-        // Delete
+        /// <summary>
+        /// Remove um chamado do banco pelo seu ID
+        /// </summary>
+        /// <param name="id">ID do chamado a ser deletado</param>
         public override void Delete(int id)
         {
             using (var conexao = ConexaoBD.GetConexao())
             {
-                
                 using (var comando = new SqlCommand("dbo.spDeleteChamados", conexao))
                 {
                     comando.CommandType = CommandType.StoredProcedure;
@@ -143,12 +169,16 @@ namespace ProjetoPBL.DAO
             }
         }
 
-        // Responder chamado
+        /// <summary>
+        /// Registra uma resposta e atualiza o status do chamado
+        /// </summary>
+        /// <param name="id">ID do chamado</param>
+        /// <param name="resposta">Texto da resposta</param>
+        /// <param name="status">Novo status do chamado</param>
         public void Responder(int id, string resposta, string status)
         {
             using (var conexao = ConexaoBD.GetConexao())
             {
-                
                 using (var comando = new SqlCommand("dbo.spResponderChamado", conexao))
                 {
                     comando.CommandType = CommandType.StoredProcedure;
@@ -161,6 +191,11 @@ namespace ProjetoPBL.DAO
             }
         }
 
+        /// <summary>
+        /// Lista chamados pertencentes a um usuário específico, ordenados pela data de abertura decrescente
+        /// </summary>
+        /// <param name="usuarioId">ID do usuário</param>
+        /// <returns>Lista de chamados do usuário</returns>
         public List<ChamadoViewModel> ListarPorUsuario(int usuarioId)
         {
             string sql = "SELECT * FROM chamados WHERE usuario_id = @usuario_id ORDER BY data_abertura DESC";
@@ -177,6 +212,10 @@ namespace ProjetoPBL.DAO
             return lista;
         }
 
+        /// <summary>
+        /// Lista todos os chamados ordenados pela data de abertura decrescente
+        /// </summary>
+        /// <returns>Lista completa de chamados</returns>
         public List<ChamadoViewModel> ListarTodos()
         {
             string sql = "SELECT * FROM chamados ORDER BY data_abertura DESC";
@@ -190,5 +229,3 @@ namespace ProjetoPBL.DAO
         }
     }
 }
-
-
