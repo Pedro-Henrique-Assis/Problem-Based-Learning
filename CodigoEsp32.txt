@@ -1,0 +1,142 @@
+#include <WiFi.h>
+#include <PubSubClient.h>
+ 
+// Configurações - variáveis editáveis
+const char* default_SSID             = "Alex";
+const char* default_PASSWORD         = "100%Atualizado";
+const char* default_BROKER_MQTT      = "54.225.206.198";
+const int   default_BROKER_PORT      = 1883;
+ 
+const char* default_TOPICO_SUBSCRIBE = "/TEF/temp01/cmd";
+const char* default_TOPICO_PUBLISH_1 = "/TEF/temp01/attrs";
+const char* default_TOPICO_PUBLISH_2 = "/TEF/temp01/attrs/t";
+const char* default_ID_MQTT          = "fiware_temp01";
+ 
+const int   default_D4               = 2;               // LED onboard
+const char* topicPrefix              = "temp01";        // Prefixo para comandos
+ 
+// Atribuição real das variáveis
+char* SSID               = const_cast<char*>(default_SSID);
+char* PASSWORD           = const_cast<char*>(default_PASSWORD);
+char* BROKER_MQTT        = const_cast<char*>(default_BROKER_MQTT);
+int   BROKER_PORT        = default_BROKER_PORT;
+char* TOPICO_SUBSCRIBE   = const_cast<char*>(default_TOPICO_SUBSCRIBE);
+char* TOPICO_PUBLISH_1   = const_cast<char*>(default_TOPICO_PUBLISH_1);
+char* TOPICO_PUBLISH_2   = const_cast<char*>(default_TOPICO_PUBLISH_2);
+char* ID_MQTT            = const_cast<char*>(default_ID_MQTT);
+int   D4                 = default_D4;
+ 
+WiFiClient espClient;
+PubSubClient MQTT(espClient);
+char EstadoSaida = '0';
+double temperatura = 0.0;
+const int PINO_TEMPERATURA = 34;
+ 
+// Função para mapear valores double
+double mapDouble(double x, double in_min, double in_max, double out_min, double out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+ 
+// Função da regressão linear para temperatura
+double calculaRegressao(double valor){
+  return ((valor - 0.043)/0.098);
+}
+ 
+void setup() {
+  Serial.begin(115200);
+  pinMode(D4, OUTPUT);
+  conectarWiFi();
+  MQTT.setServer(BROKER_MQTT, BROKER_PORT);
+  MQTT.setCallback(callbackMQTT);
+  piscarLED(3);
+}
+ 
+void loop() {
+  if (!MQTT.connected()) {
+    reconectarMQTT();
+  }
+ 
+  MQTT.loop();
+  publicarTemperatura();
+  delay(5000);
+}
+ 
+void conectarWiFi() {
+  Serial.println("Conectando-se ao WiFi...");
+  WiFi.begin(SSID, PASSWORD);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi conectado!");
+  Serial.println(WiFi.localIP());
+}
+ 
+void reconectarMQTT() {
+  while (!MQTT.connected()) {
+    Serial.print("Tentando conectar ao MQTT... ");
+    if (MQTT.connect(ID_MQTT)) {
+      Serial.println("Conectado!");
+      MQTT.subscribe(TOPICO_SUBSCRIBE);
+      MQTT.publish(TOPICO_PUBLISH_1, "s|on");
+    } else {
+      Serial.println("Falha. Tentando novamente em 2 segundos.");
+      delay(2000);
+    }
+  }
+}
+ 
+void callbackMQTT(char* topic, byte* payload, unsigned int length) {
+  String msg = "";
+  for (int i = 0; i < length; i++) {
+    msg += (char)payload[i];
+  }
+ 
+  String onMsg = String(topicPrefix) + "@on|";
+  String offMsg = String(topicPrefix) + "@off|";
+ 
+  if (msg == onMsg) {
+    digitalWrite(D4, HIGH);
+    EstadoSaida = '1';
+    MQTT.publish(TOPICO_PUBLISH_1, "s|on");
+  } else if (msg == offMsg) {
+    digitalWrite(D4, LOW);
+    EstadoSaida = '0';
+    MQTT.publish(TOPICO_PUBLISH_1, "s|off");
+  }
+ 
+  Serial.println("Comando recebido: " + msg);
+}
+ 
+void publicarTemperatura() {
+  int leitura = analogRead(PINO_TEMPERATURA);
+  Serial.print("Leitura ADC: ");
+  Serial.println(leitura);
+ 
+  double tensao = mapDouble((double)leitura, 0.0, 4095.0, 0.0, 3.3);
+  Serial.print("Tensão mapeada: ");
+  Serial.println(tensao, 3);
+ 
+  // Aplica regressão para calcular a temperatura
+  temperatura = calculaRegressao(tensao);
+ 
+  char mensagem[10];
+  dtostrf(temperatura, 4, 2, mensagem);
+ 
+  Serial.print("Temperatura: ");
+  Serial.print(mensagem);
+  Serial.println(" °C");
+ 
+  MQTT.publish(TOPICO_PUBLISH_2, mensagem);
+}
+ 
+ 
+void piscarLED(int vezes) {
+  for (int i = 0; i < vezes; i++) {
+    digitalWrite(D4, HIGH);
+    delay(300);
+    digitalWrite(D4, LOW);
+    delay(300);
+  }
+}
+ 
