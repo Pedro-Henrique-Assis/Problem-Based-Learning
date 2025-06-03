@@ -9,18 +9,29 @@ namespace ProjetoPBL.Controllers
 {
     public class DashboardController : Controller
     {
+        /// <summary>
+        /// Executado antes de qualquer ação do controller.
+        /// Verifica se o usuário está logado, redirecionando para a página de login caso não esteja.
+        /// Caso esteja logado, define ViewBag.Logado como true para uso nas views.
+        /// </summary>
+        /// <param name="context">Contexto da ação executando.</param>
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             if (!HelperControllers.VerificaUserLogado(HttpContext.Session))
-                context.Result = RedirectToAction("Index", "Login");
+                context.Result = RedirectToAction("Index", "Login"); // Redireciona para login se não estiver logado
             else
             {
-                ViewBag.Logado = true;
+                ViewBag.Logado = true; // Usuário logado, informa a view
                 base.OnActionExecuting(context);
             }
         }
 
-        // 🔹 Dashboard com ponto de τ baseado no valor mais próximo de 63,2%
+        /// <summary>
+        /// Action que exibe o Dashboard1.
+        /// Carrega os dados de temperatura e calcula parâmetros do sistema (ganho, constante de tempo tau, tempo real e valor alvo 63,2%).
+        /// Passa esses valores para a View via ViewBag e retorna a lista de dados para exibição.
+        /// </summary>
+        /// <returns>View "Dashboard1" com dados de temperatura e parâmetros calculados.</returns>
         public IActionResult Dashboard1()
         {
             var dao = new TemperaturaDAO();
@@ -32,11 +43,14 @@ namespace ProjetoPBL.Controllers
             ViewBag.RecvTimeTau = tempoReal?.ToString("HH:mm");
             ViewBag.Alvo632 = alvo632;
 
-
             return View("Dashboard1", dados);
         }
 
-        // 🔹 Dashboard com regressão linear
+        /// <summary>
+        /// Action que exibe o Dashboard2.
+        /// Fornece uma lista fixa de dados para regressão linear e passa coeficientes, desvios e erros para a View via ViewBag.
+        /// </summary>
+        /// <returns>View "Dashboard2" com dados estáticos para análise de regressão.</returns>
         public IActionResult Dashboard2()
         {
             var dados = new List<RegressaoViewModel>
