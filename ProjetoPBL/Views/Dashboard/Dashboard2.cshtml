@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Modelo de Regressão Linear - Temperatura x Voltagem";
+    ViewData["Title"] = "Modelo de Regressão Linear - Temperatura x Voltagem (Eixos Invertidos)";
 }
 
 <h2 style="text-align: center;">@ViewData["Title"]</h2>
@@ -9,8 +9,6 @@
 </div>
 
 <div style="margin-top: 30px;">
-    
-
     <p><strong>Medições por temperatura:</strong></p>
     <table class="table table-bordered">
         <thead>
@@ -131,12 +129,12 @@
                 {
                     label: 'Medições Reais',
                     data: [
-                        { x: 3.03, y: 30 }, { x: 2.906666667, y: 30 }, { x: 2.95, y: 30 }, { x: 2.95, y: 30 }, { x: 2.97, y: 30 },
-                        { x: 3.536666667, y: 35 }, { x: 3.506666667, y: 35 }, { x: 3.506666667, y: 35 }, { x: 3.476666667, y: 35 }, { x: 3.483333333, y: 35 },
-                        { x: 3.946666667, y: 40 }, { x: 3.936666667, y: 40 }, { x: 3.903333333, y: 40 }, { x: 3.99, y: 40 }, { x: 3.983333333, y: 40 },
-                        { x: 4.46, y: 45 }, { x: 4.5, y: 45 }, { x: 4.48, y: 45 }, { x: 4.5, y: 45 }, { x: 4.48, y: 45 },
-                        { x: 4.943333333, y: 50 }, { x: 4.986666667, y: 50 }, { x: 4.956666667, y: 50 }, { x: 4.98, y: 50 }, { x: 4.956666667, y: 50 },
-                        { x: 5.403333333, y: 55 }, { x: 5.476666667, y: 55 }, { x: 5.446666667, y: 55 }, { x: 5.47, y: 55 }, { x: 5.48, y: 55 }
+                        { y: 3.03, x: 30 }, { y: 2.906666667, x: 30 }, { y: 2.95, x: 30 }, { y: 2.95, x: 30 }, { y: 2.97, x: 30 },
+                        { y: 3.536666667, x: 35 }, { y: 3.506666667, x: 35 }, { y: 3.506666667, x: 35 }, { y: 3.476666667, x: 35 }, { y: 3.483333333, x: 35 },
+                        { y: 3.946666667, x: 40 }, { y: 3.936666667, x: 40 }, { y: 3.903333333, x: 40 }, { y: 3.99, x: 40 }, { y: 3.983333333, x: 40 },
+                        { y: 4.46, x: 45 }, { y: 4.5, x: 45 }, { y: 4.48, x: 45 }, { y: 4.5, x: 45 }, { y: 4.48, x: 45 },
+                        { y: 4.943333333, x: 50 }, { y: 4.986666667, x: 50 }, { y: 4.956666667, x: 50 }, { y: 4.98, x: 50 }, { y: 4.956666667, x: 50 },
+                        { y: 5.403333333, x: 55 }, { y: 5.476666667, x: 55 }, { y: 5.446666667, x: 55 }, { y: 5.47, x: 55 }, { y: 5.48, x: 55 }
                     ],
                     showLine: false,
                     backgroundColor: 'red',
@@ -144,10 +142,10 @@
                 },
                 {
                     label: 'Regressão Linear',
-                    data: Array.from({length: 61}, (_, i) => {
-                        let x = 2.9 + i * 0.05;
-                        let y = 10.05 * x + 0.09;
-                        return { x, y };
+                    data: Array.from({ length: 61 }, (_, i) => {
+                        let temp = 30 + i * 0.5;
+                        let volt = 0.09868 * temp + 0.03444;
+                        return { x: temp, y: volt };
                     }),
                     type: 'line',
                     borderWidth: 2,
@@ -163,18 +161,14 @@
             options: {
                 scales: {
                     x: {
-                        title: { display: true, text: 'Voltagem (V)' }
-                    },
-                    y: {
                         title: { display: true, text: 'Temperatura (°C)' },
                         min: 25,
                         max: 60
-                    }
-                },
-                plugins: {
-                    title: {
-                        display: true,
-                       
+                    },
+                    y: {
+                        title: { display: true, text: 'Voltagem (V)' },
+                        min: 2.8,
+                        max: 5.8
                     }
                 }
             }
