@@ -20,9 +20,20 @@
 }
 
 function confirmarExclusaoUsuario(usuarioId, usuarioNome) {
-    if (confirm(`Tem certeza que deseja excluir o usuário "${usuarioNome}" (ID: ${usuarioId})?`)) {
-        excluirUsuarioAjax(usuarioId);
-    }
+    Swal.fire({
+        title: 'Tem certeza?',
+        text: `Você deseja excluir o usuário "${usuarioNome}" (ID: ${usuarioId})? Esta ação não poderá ser revertida!`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            excluirUsuarioAjax(usuarioId);
+        }
+    });
 }
 
 function excluirUsuarioAjax(usuarioId) {
@@ -31,26 +42,32 @@ function excluirUsuarioAjax(usuarioId) {
         type: "POST",
         data: { id: usuarioId },
         success: function (response) {
-            var divMensagens = $('#divMensagensAdmin');
+            var divMensagens = $('#divMensagensAdmin'); // Make sure you have this div in your ConsultaAvancada.cshtml
             divMensagens.html(''); // Limpa mensagens anteriores
 
-            // Se o controller retornar um JSON simples para indicar sucesso/erro:
             if (response.sucesso) {
                 // Remove a linha da tabela
                 $("#usuario-row-" + usuarioId).remove();
-
-                if (response.mensagem) {
-                    divMensagens.html('<div class="alert alert-success" role="alert">' + response.mensagem + '</div>');
-                }
+                Swal.fire(
+                    'Excluído!',
+                    response.mensagem || 'O usuário foi excluído com sucesso.',
+                    'success'
+                );
             } else {
-                if (response.mensagem) {
-                    divMensagens.html('<div class="alert alert-danger" role="alert">' + response.mensagem + '</div>');
-                }
+                Swal.fire(
+                    'Erro!',
+                    response.mensagem || 'Ocorreu um erro ao tentar excluir o usuário.',
+                    'error'
+                );
             }
         },
         error: function (xhr, status, error) {
             console.error("Erro na exclusão: ", status, error);
-            alert("Ocorreu um erro ao tentar excluir o usuário.");
+            Swal.fire(
+                'Erro!',
+                'Ocorreu um erro na comunicação ao tentar excluir o usuário.',
+                'error'
+            );
         }
     });
 }
